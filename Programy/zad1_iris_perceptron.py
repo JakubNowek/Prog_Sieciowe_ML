@@ -40,11 +40,12 @@ class Perceptron(object):
 df = pd.read_csv('iris.data', header=None)
 
 # setosa and versicolor
-y = df.iloc[0:100, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
+y = df.iloc[0:150, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
 y = np.where(y == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+print(y)
 # sepal length and petal length
-X = df.iloc[0:100, [0, 2]].values  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
-
+X = df.iloc[0:150, [0, 2]].values  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
+print(X)
 
 # -----------------------part 3--------------------------#
 ppn = Perceptron(epochs=10, eta=0.1)  # tworzenie nowego perceptronu
@@ -61,3 +62,4 @@ plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')  # plotowanie 
 plt.xlabel('Iterations')
 plt.ylabel('Misclassifications')
 plt.show()
+
