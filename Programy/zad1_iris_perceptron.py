@@ -39,13 +39,20 @@ class Perceptron(object):
 # pobieranie danych w formacie csv
 df = pd.read_csv('iris.data', header=None)
 
+df_set = df.iloc[:50]
+# print(df_set)
+df_ver = df.iloc[50:100]
+print(df_ver)
+df_vir = df.iloc[100:150]
+# print(df_vir)
+# print(len(df_set.index), " ", len(df_ver.index), " ", len(df_vir.index))  # sprawdzanie długości data frame
+
 # setosa and versicolor
 y = df.iloc[0:150, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
 y = np.where(y == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
-print(y)
 # sepal length and petal length
 X = df.iloc[0:150, [0, 2]].values  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
-print(X)
+
 
 # -----------------------part 3--------------------------#
 ppn = Perceptron(epochs=10, eta=0.1)  # tworzenie nowego perceptronu
