@@ -47,17 +47,22 @@ df_vir = df.iloc[100:140]
 # print(df_vir)
 
 df_training = pd.concat([df_set, df_ver, df_vir], ignore_index=True)  # zbiór treningowy - 40x40x40
-df_test = pd.concat([df.iloc[40:50], df.iloc[90:100], df.iloc[140:150]], ignore_index=True)  # zbiór testowy 10x10x10
+
+test_df_set = df.iloc[40:50]
+test_df_ver = df.iloc[90:100]
+test_df_vir = df.iloc[140:150]
+
+df_test = pd.concat((test_df_ver, test_df_set, test_df_vir), ignore_index=True)  # zbiór testowy 10x10x10
 
 # setosa vs versicolor and virginica
 y = df.iloc[0:150, 4].values  # 150 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
 y = np.where(y == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 
-y_training = df.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
+y_training = df_training.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
 y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 
 # sepal length and petal length
-X = df.iloc[0:150, [0, 2]].values  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
+ # pobieranie długości kielicha i płatka (kolumny 0 i 2)
 X_training = df_training.iloc[0:120, [0, 2]].values
 X_test = df_test.iloc[0:30, [0, 2]].values
 
