@@ -39,34 +39,43 @@ class Perceptron(object):
 # pobieranie danych w formacie csv
 df = pd.read_csv('iris.data', header=None)
 
-df_set = df.iloc[:50]
+df_set = df.iloc[:40]
 # print(df_set)
-df_ver = df.iloc[50:100]
-print(df_ver)
-df_vir = df.iloc[100:150]
+df_ver = df.iloc[50:90]
+# print(df_ver)
+df_vir = df.iloc[100:140]
 # print(df_vir)
-# print(len(df_set.index), " ", len(df_ver.index), " ", len(df_vir.index))  # sprawdzanie długości data frame
 
-# setosa and versicolor
-y = df.iloc[0:150, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
+df_training = pd.concat([df_set, df_ver, df_vir], ignore_index=True)  # zbiór treningowy - 40x40x40
+df_test = pd.concat([df.iloc[40:50], df.iloc[90:100], df.iloc[140:150]], ignore_index=True)  # zbiór testowy 10x10x10
+
+# setosa vs versicolor and virginica
+y = df.iloc[0:150, 4].values  # 150 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
 y = np.where(y == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+
+y_training = df.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
+y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+
 # sepal length and petal length
 X = df.iloc[0:150, [0, 2]].values  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
+X_training = df_training.iloc[0:120, [0, 2]].values
+X_test = df_test.iloc[0:30, [0, 2]].values
 
 
 # -----------------------part 3--------------------------#
 ppn = Perceptron(epochs=10, eta=0.1)  # tworzenie nowego perceptronu
 
-ppn.train(X, y)  # do funkcji train wrzucamy długości i właściwe odpowiedzi
+ppn.train(X_training, y_training)
 print('Weights: %s' % ppn.w_)
-plot_decision_regions(X, y, clf=ppn)  # plotowanie danych z klasyfikacją
+plot_decision_regions(X_training, y_training, clf=ppn)
 plt.title('Perceptron')
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
 plt.show()
 
-plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')  # plotowanie wartości błędów w zależności od iteracji
+plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
 plt.xlabel('Iterations')
 plt.ylabel('Misclassifications')
 plt.show()
 
+print(ppn.predict(X_test))
