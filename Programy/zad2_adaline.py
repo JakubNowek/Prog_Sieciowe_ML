@@ -60,19 +60,28 @@ y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa
 X_training = df_training.iloc[0:120, [0, 2]].values
 X_test = df_test.iloc[0:30, [0, 2]].values
 
+# Standaryzowanie danych
+# standaryzowanie zbioru uczącego
+X_train_std = np.copy(X_training)
+X_train_std[:,0] = (X_training[:,0] - X_training[:,0].mean()) / X_training[:,0].std()
+X_train_std[:,1] = (X_training[:,1] - X_training[:,1].mean()) / X_training[:,1].std()
 
+# standaryzowanie zbioru treningowego
+X_test_std = np.copy(X_test)
+X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
+X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 # część wykonawcza
 ada = AdalineSGD(epochs=15, eta=0.01)
 # train and adaline and plot decision regions
-ada.train(X_training, y_training)
-plot_decision_regions(X_training, y_training, clf=ada)
+ada.train(X_train_std, y_training)
+plot_decision_regions(X_train_std, y_training, clf=ada)
 plt.title('Adaline - Gradient Descent')
 plt.xlabel('sepal length [standardized]')
 plt.ylabel('petal length [standardized]')
 plt.show()
 
-ada_output = ada.net_input(X_test)  # o(x)
-print(ada_output)
+ada_output = ada.net_input(X_test_std)  # o(x)
+#print(ada_output)
 plt.plot(range(1, len(ada_output)+1), ada_output, marker='o')
 plt.title('Adaline - o(x) dla z ze zboru walidacyjnego')
 plt.xlabel('indeks x ze zbioru walidacyjnego')
@@ -80,7 +89,7 @@ plt.ylabel('o(x)')
 plt.show()
 
 # testowanie
-print(ada.predict(X_test))
+print(ada.predict(X_test_std))
 
 plt.plot(range(1, len(ada.cost_)+1), ada.cost_, marker='o')
 plt.title('Wartość błędu w zależności od ilości iteracji')
