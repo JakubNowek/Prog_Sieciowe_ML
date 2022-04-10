@@ -1,59 +1,54 @@
 import numpy as np
 import pandas as pd
-
-#  %matplotlib inline
 import matplotlib.pyplot as plt
 from mlxtend.plotting import plot_decision_regions
 
 
-class Perceptron(object):
+class AdalineGD(object):
 
     def __init__(self, eta=0.01, epochs=50):
         self.eta = eta
         self.epochs = epochs
 
     def train(self, X, y):
-
         self.w_ = np.zeros(1 + X.shape[1])
-        self.errors_ = []
+        self.cost_ = []
 
-        for _ in range(self.epochs):
-            errors = 0
-            for xi, target in zip(X, y):
-                update = self.eta * (target - self.predict(xi))
-                self.w_[1:] += update * xi
-                self.w_[0] += update
-                errors += int(update != 0.0)
-            self.errors_.append(errors)
+        for i in range(self.epochs):
+            output = self.net_input(X)
+            errors = (y - output)
+            self.w_[1:] += self.eta * X.T.dot(errors)
+            self.w_[0] += self.eta * errors.sum()
+            cost = (errors ** 2).sum() / 2.0
+            self.cost_.append(cost)
         return self
 
     def net_input(self, X):
         return np.dot(X, self.w_[1:]) + self.w_[0]
 
+    def activation(self, X):
+        return self.net_input(X)
+
     def predict(self, X):
-        return np.where(self.net_input(X) >= 0.0, 1, -1)
+        return np.where(self.activation(X) >= 0.0, 1, -1)
 
 
 # pobieranie danych w formacie csv
 df = pd.read_csv('iris.data', header=None)
 
+# wydzielenie danych treningowych
 df_set = df.iloc[:40]
-# print(df_set)
 df_ver = df.iloc[50:90]
-# print(df_ver)
 df_vir = df.iloc[100:140]
-# print(df_vir)
-
 df_training = pd.concat([df_set, df_ver, df_vir], ignore_index=True)  # zbiór treningowy - 40x40x40
 
+# wydzielenie danych testowych
 test_df_set = df.iloc[40:50]
 test_df_ver = df.iloc[90:100]
 test_df_vir = df.iloc[140:150]
-
 df_test = pd.concat((test_df_set, test_df_ver, test_df_vir), ignore_index=True)  # zbiór testowy 10x10x10
 
 y_training = df_training.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
-### print("trening\n", y_training)  # debugging
 # setosa vs (versicolor + virginica)
 y_tr_setosa = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 ### print("trening\n", y_tr_setosa)  # debugging
@@ -64,11 +59,12 @@ y_tr_versicolor = np.where(y_training == 'Iris-versicolor', -1, 1)  # jeśli 'Ir
 y_tr_virginica = np.where(y_training == 'Iris-virginica', -1, 1)  # jeśli 'Iris-virginica' zwróć -1, jeśli nie daj 1
 ### print("trening\n", y_tr_virginica)  # debugging
 
-# pobieranie długości kielicha i płatka (kolumny 0 i 2)
+# Tworzenie zbioru treningowego i testowego - pobieranie długości kielicha i płatka (kolumny 0 i 2)
 X_training = df_training.iloc[0:120, [0, 2]].values
 X_test = df_test.iloc[0:30, [0, 2]].values
 
-
+# Standaryzowanie danych
+# standaryzowanie zbioru uczącego
 X_train_std = np.copy(X_training)
 X_train_std[:,0] = (X_training[:,0] - X_training[:,0].mean()) / X_training[:,0].std()
 X_train_std[:,1] = (X_training[:,1] - X_training[:,1].mean()) / X_training[:,1].std()
@@ -78,30 +74,36 @@ X_test_std = np.copy(X_test)
 X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
 X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 
-ppn_setosa = Perceptron(epochs=100, eta=0.1)  # tworzenie nowego perceptronu rozpoznającego setosy
-ppn_versicolor = Perceptron(epochs=300, eta=0.000001)  # tworzenie nowego perceptronu rozpoznającego versicolory
-ppn_virginica = Perceptron(epochs=100, eta=0.1)  # tworzenie nowego perceptronu rozpoznającego virginice
+# tworzenie 3 klasyfikatorów
+ada_setosa = AdalineGD(epochs=50, eta=0.001)
+ada_versicolor = AdalineGD(epochs=50, eta=0.001)
+ada_virginica = AdalineGD(epochs=50, eta=0.001)
 
-ppn_setosa.train(X_train_std, y_tr_setosa)
-ppn_versicolor.train(X_train_std, y_tr_versicolor)
-ppn_virginica.train(X_train_std, y_tr_virginica)
+# train and adaline and plot decision regions
+ada_setosa.train(X_train_std, y_tr_setosa)
+ada_versicolor.train(X_train_std, y_tr_versicolor)
+ada_virginica.train(X_train_std, y_tr_virginica)
 
-# print('Weights: %s' % ppn_setosa.w_)
-# print('Weights: %s' % ppn_versicolor.w_)
-# print('Weights: %s' % ppn_virginica.w_)
-
-# plot_decision_regions(X_training, y_training, clf=ppn)
-# plt.title('Perceptron')
-# plt.xlabel('sepal length [cm]')
-# plt.ylabel('petal length [cm]')
-# plt.show()
-#
-# plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
-# plt.xlabel('Iterations')
-# plt.ylabel('Misclassifications')
+# plot_decision_regions(X_train_std, y_training, clf=ada)
+# plt.title('Adaline - Gradient Descent')
+# plt.xlabel('sepal length [standardized]')
+# plt.ylabel('petal length [standardized]')
 # plt.show()
 
-# testowanie nauczonego perceptronu
-print(ppn_setosa.predict(X_test_std))
-print(ppn_versicolor.predict(X_test_std))
-print(ppn_virginica.predict(X_test_std))
+# ada_output = ada.net_input(X_test_std)  # o(x)
+# #print(ada_output)
+# plt.plot(range(1, len(ada_output)+1), ada_output, marker='o')
+# plt.title('Adaline - o(x) dla z ze zboru walidacyjnego')
+# plt.xlabel('indeks x ze zbioru walidacyjnego')
+# plt.ylabel('o(x)')
+# plt.show()
+
+# testowanie
+print(ada_setosa.predict(X_test_std))
+print(ada_versicolor.predict(X_test_std))
+print(ada_virginica.predict(X_test_std))
+# plt.plot(range(1, len(ada.cost_)+1), ada.cost_, marker='o')
+# plt.title('Wartość błędu w zależności od ilości iteracji')
+# plt.xlabel('Ilość iteracji')
+# plt.ylabel('Sum-squared-error')
+# plt.show()
