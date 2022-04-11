@@ -105,6 +105,7 @@ plt.title('Perceptron')
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
 plt.show()
+
 # plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
 # plt.xlabel('Iterations')
 # plt.ylabel('Misclassifications')
@@ -119,20 +120,22 @@ result_vir = list(ppn_virginica.predict(X_test_std))
 print(result_vir)
 
 # ostateczny wynik algorytmu? jeśli wykryto w jednej to nazwa, a jeśli w dwóch to brak nazwy
-result_array = np.array([result_set, result_ver, result_vir])
-result_list = []
-print(result_array)
-array_sum = np.sum(result_array, axis=0)
-# result = list(np.zeros(len(X_test_std)))
-for i in range(np.shape(result_array)[1]):  # iterowanie po ilości kolumn
-    if array_sum[i] == 1:  # sumowanie elementów w kolumnach
-        if result_set[i] == -1:
-            result_list.append('Set')
-        if result_ver[i] == -1:
-            result_list.append('Ver')
-        if result_vir[i] == -1:
-            result_list.append('Vir')
+result_list = list(np.zeros(len(X_test_std)))
+for i in range(len(X_test_std)):  # iterowanie po ilości kolumn
+    pom = 0
+    if (result_set[i] == -1) and (1/(ppn_setosa.errors_[-1]+1) > pom):
+        pom = ppn_setosa.errors_[-1]
+        result_list[i] = 'Set'
+    if result_ver[i] == -1:
+        if 1/ppn_versicolor.errors_[-1]+1 > pom:
+            pom = ppn_versicolor.errors_[-1]
+            result_list[i] = 'Ver'
+    if result_vir[i] == -1:
+        if 1/ppn_virginica.errors_[-1]+1 > pom:
+            pom = ppn_virginica.errors_[-1]
+            result_list[i] = 'Vir'
     else:
-        result_list.append('-')
+        result_list[i] = '-'
+# result_list[1] = 'lama'
 print(result_list)
-
+# print("errors :", ppn_setosa.errors_)
