@@ -112,30 +112,42 @@ plt.show()
 # plt.show()
 
 # testowanie nauczonego perceptronu
-result_set = list(ppn_setosa.predict(X_test_std))
+result_set = ppn_setosa.predict(X_test_std)
 print(result_set)
-result_ver = list(ppn_versicolor.predict(X_test_std))
+result_ver = ppn_versicolor.predict(X_test_std)
 print(result_ver)
-result_vir = list(ppn_virginica.predict(X_test_std))
+result_vir = ppn_virginica.predict(X_test_std)
 print(result_vir)
 
-# ostateczny wynik algorytmu? jeśli wykryto w jednej to nazwa, a jeśli w dwóch to brak nazwy
 result_list = list(np.zeros(len(X_test_std)))
+
 for i in range(len(X_test_std)):  # iterowanie po ilości kolumn
-    pom = 0
-    if (result_set[i] == -1) and (1/(ppn_setosa.errors_[-1]+1) > pom):
-        pom = ppn_setosa.errors_[-1]
+    isDetected = False
+    error = 0
+    # setosa
+    if result_set[i] == -1:
         result_list[i] = 'Set'
-    if result_ver[i] == -1:
-        if 1/ppn_versicolor.errors_[-1]+1 > pom:
-            pom = ppn_versicolor.errors_[-1]
+        isDetected = True
+        error = ppn_setosa.errors_[-1]
+    # versicolor
+    if result_ver[i] == -1 and isDetected == True:
+        if ppn_versicolor.errors_[-1]<error:
             result_list[i] = 'Ver'
-    if result_vir[i] == -1:
-        if 1/ppn_virginica.errors_[-1]+1 > pom:
-            pom = ppn_virginica.errors_[-1]
-            result_list[i] = 'Vir'
-    else:
+    if result_ver[i] == -1 and isDetected == False:
+        result_list[i] = 'Ver'
+        isDetected = True
+        error = ppn_versicolor.errors_[-1]
+    # virginica
+    if result_vir[i] == -1 and isDetected == True:
+        if ppn_virginica.errors_[-1] < error:
+            result_list[i] = 'Ver'
+    if result_vir[i] == -1 and isDetected == False:
+        result_list[i] = 'Vir'
+        isDetected = True
+# print(result_list)
+for i in range(len(result_list)):  # jeśli żaden klasyfikator nie wykrył, wpisz '-'
+    if result_list[i] == 0:
         result_list[i] = '-'
-# result_list[1] = 'lama'
 print(result_list)
-# print("errors :", ppn_setosa.errors_)
+# oczywiście można by zrobić, że do każdego kwiatu testowego wypisuje, z jakim błędem stwierdza, że to to lub nie to,
+# ale nie było to wymagane w zadaniu
