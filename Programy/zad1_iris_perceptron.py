@@ -1,3 +1,5 @@
+import matplotlib.figure
+import matplotlib.pyplot
 import numpy as np
 import pandas as pd
 
@@ -50,7 +52,7 @@ test_df_set = df.iloc[40:50]
 test_df_ver = df.iloc[90:100]
 test_df_vir = df.iloc[140:150]
 
-df_test = pd.concat((test_df_ver, test_df_set, test_df_vir), ignore_index=True)  # zbiór testowy 10x10x10
+df_test = pd.concat((test_df_set, test_df_ver, test_df_vir), ignore_index=True)  # zbiór testowy 10x10x10
 
 # setosa vs versicolor and virginica
 
@@ -62,20 +64,27 @@ y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa
 X_training = df_training.iloc[0:120, [0, 2]].values
 X_test = df_test.iloc[0:30, [0, 2]].values
 
-
-ppn = Perceptron(epochs=10, eta=0.1)  # tworzenie nowego perceptronu
-
+ppn = Perceptron(epochs=10, eta=0.01)  # tworzenie nowego perceptronu
 ppn.train(X_training, y_training)
+
+
+plt.figure(figsize=(12, 6))
+plt.subplots_adjust(wspace=0.4)
+plt.subplot(1,2,1)
 print('Weights: %s' % ppn.w_)
 plot_decision_regions(X_training, y_training, clf=ppn)
 plt.title('Perceptron')
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
-plt.show()
+# plt.show()
 
+plt.subplot(1,2,2)
 plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
 plt.xlabel('Iterations')
 plt.ylabel('Misclassifications')
+
+tytul = "Model perceptronu dla: epochs = {0}, eta = {1}". format(ppn.epochs, ppn.eta)
+plt.suptitle(tytul)
 plt.show()
 
 # testowanie nauczonego perceptronu

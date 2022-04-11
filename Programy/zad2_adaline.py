@@ -96,3 +96,6 @@ plt.title('Wartość błędu w zależności od ilości iteracji')
 plt.xlabel('Ilość iteracji')
 plt.ylabel('Sum-squared-error')
 plt.show()
+
+# plt.figure(figsize=(12, 6))
+# plt.subplots_adjust(wspace=0.4)

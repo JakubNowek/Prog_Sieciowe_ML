@@ -120,4 +120,35 @@ print(result_vir)
 # plt.xlabel('Ilość iteracji')
 # plt.ylabel('Sum-squared-error')
 # plt.show()
-print("errors", ada_setosa.cost_)
+result_list = list(np.zeros(len(X_test_std)))
+
+for i in range(len(X_test_std)):  # iterowanie po ilości kolumn
+    isDetected = False
+    error = 0
+    # setosa
+    if result_set[i] == -1:
+        result_list[i] = 'Set'
+        isDetected = True
+        error = ada_setosa.cost_[-1]
+    # versicolor
+    if result_ver[i] == -1 and isDetected == True:
+        if ada_versicolor.cost_[-1]<error:
+            result_list[i] = 'Ver'
+    if result_ver[i] == -1 and isDetected == False:
+        result_list[i] = 'Ver'
+        isDetected = True
+        error = ada_versicolor.cost_[-1]
+    # virginica
+    if result_vir[i] == -1 and isDetected == True:
+        if ada_virginica.cost_[-1] < error:
+            result_list[i] = 'Ver'
+    if result_vir[i] == -1 and isDetected == False:
+        result_list[i] = 'Vir'
+        isDetected = True
+# print(result_list)
+for i in range(len(result_list)):  # jeśli żaden klasyfikator nie wykrył, wpisz '-'
+    if result_list[i] == 0:
+        result_list[i] = '-'
+print(result_list)
+# oczywiście można by zrobić, że do każdego kwiatu testowego wypisuje, z jakim błędem stwierdza, że to to lub nie to,
+# ale nie było to wymagane w zadaniu
