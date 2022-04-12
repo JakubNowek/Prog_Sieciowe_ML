@@ -60,44 +60,47 @@ y_tr_virginica = np.where(y_training == 'Iris-virginica', -1, 1)  # jeśli 'Iris
 ### print("trening\n", y_tr_virginica)  # debugging
 
 # Tworzenie zbioru treningowego i testowego - pobieranie długości kielicha i płatka (kolumny 0 i 2)
-X_training = df_training.iloc[0:120, [0, 2]].values
-X_test = df_test.iloc[0:30, [0, 2]].values
+X_training = df_training.iloc[0:120, [0, 1, 2, 3]].values
+X_test = df_test.iloc[0:30, [0, 1, 2, 3]].values
 
 # Standaryzowanie danych
 # standaryzowanie zbioru uczącego
 X_train_std = np.copy(X_training)
 X_train_std[:,0] = (X_training[:,0] - X_training[:,0].mean()) / X_training[:,0].std()
 X_train_std[:,1] = (X_training[:,1] - X_training[:,1].mean()) / X_training[:,1].std()
-
+X_train_std[:,2] = (X_training[:,2] - X_training[:,2].mean()) / X_training[:,2].std()
+X_train_std[:,3] = (X_training[:,3] - X_training[:,3].mean()) / X_training[:,3].std()
 # standaryzowanie zbioru treningowego
 X_test_std = np.copy(X_test)
 X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
 X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
+X_test_std[:, 2] = (X_test[:, 2] - X_test[:, 2].mean()) / X_test[:, 2].std()
+X_test_std[:, 3] = (X_test[:, 3] - X_test[:, 3].mean()) / X_test[:, 3].std()
 
 # tworzenie 3 klasyfikatorów
-ada_setosa = AdalineGD(epochs=100, eta=0.001)
-ada_versicolor = AdalineGD(epochs=10, eta=0.01)
-ada_virginica = AdalineGD(epochs=100, eta=0.001)
+ada_setosa = AdalineGD(epochs=100, eta=0.01)
+ada_versicolor = AdalineGD(epochs=100, eta=0.01)
+ada_virginica = AdalineGD(epochs=1000, eta=0.01)
 
 # train and adaline and plot decision regions
 ada_setosa.train(X_train_std, y_tr_setosa)
 ada_versicolor.train(X_train_std, y_tr_versicolor)
 ada_virginica.train(X_train_std, y_tr_virginica)
 
-plot_decision_regions(X_train_std, y_tr_setosa, clf=ada_setosa)
+# plot_decision_regions(X_train_std, y_tr_setosa, clf=ada_setosa)
 # plt.title('AdalineGD')
 # plt.xlabel('sepal length [cm]')
 # plt.ylabel('petal length [cm]')
 
-plot_decision_regions(X_train_std, y_tr_versicolor, clf=ada_versicolor)
+# plot_decision_regions(X_train_std, y_tr_versicolor, clf=ada_versicolor)
 # plt.title('AdalineGD')
 # plt.xlabel('sepal length [cm]')
 # plt.ylabel('petal length [cm]')
 
-plot_decision_regions(X_train_std, y_tr_virginica, clf=ada_virginica)
-plt.title('AdalineGD')
-plt.xlabel('sepal length [cm]')
-plt.ylabel('petal length [cm]')
+# plot_decision_regions(X_train_std, y_tr_virginica, clf=ada_virginica)
+# plt.title('AdalineGD')
+# plt.xlabel('sepal length [cm]')
+# plt.ylabel('petal length [cm]')
 #####plt.show()
 
 # ada_output = ada.net_input(X_test_std)  # o(x)
