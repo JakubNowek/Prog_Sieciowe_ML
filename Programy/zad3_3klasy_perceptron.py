@@ -78,9 +78,9 @@ X_test_std = np.copy(X_test)
 X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
 X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 
-ppn_setosa = Perceptron(epochs=10, eta=0.01)  # tworzenie nowego perceptronu rozpoznającego setosy
+ppn_setosa = Perceptron(epochs=10, eta=0.001)  # tworzenie nowego perceptronu rozpoznającego setosy
 ppn_versicolor = Perceptron(epochs=10, eta=0.001)  # tworzenie nowego perceptronu rozpoznającego versicolory
-ppn_virginica = Perceptron(epochs=100, eta=0.01)  # tworzenie nowego perceptronu rozpoznającego virginice
+ppn_virginica = Perceptron(epochs=10, eta=0.001)  # tworzenie nowego perceptronu rozpoznającego virginice
 
 ppn_setosa.train(X_train_std, y_tr_setosa)
 ppn_versicolor.train(X_train_std, y_tr_versicolor)

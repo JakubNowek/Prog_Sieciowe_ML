@@ -76,7 +76,7 @@ X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 
 # tworzenie 3 klasyfikatorów
 ada_setosa = AdalineGD(epochs=100, eta=0.001)
-ada_versicolor = AdalineGD(epochs=1000, eta=0.01)
+ada_versicolor = AdalineGD(epochs=10, eta=0.01)
 ada_virginica = AdalineGD(epochs=100, eta=0.001)
 
 # train and adaline and plot decision regions
@@ -98,7 +98,7 @@ plot_decision_regions(X_train_std, y_tr_virginica, clf=ada_virginica)
 plt.title('AdalineGD')
 plt.xlabel('sepal length [cm]')
 plt.ylabel('petal length [cm]')
-plt.show()
+#####plt.show()
 
 # ada_output = ada.net_input(X_test_std)  # o(x)
 # #print(ada_output)
@@ -149,6 +149,16 @@ for i in range(len(X_test_std)):  # iterowanie po ilości kolumn
 for i in range(len(result_list)):  # jeśli żaden klasyfikator nie wykrył, wpisz '-'
     if result_list[i] == 0:
         result_list[i] = '-'
-print(result_list)
+# print(result_list)
+print("Co przewidział klasyfikator")
+print("Epochs Setosa= ", ada_setosa.epochs,
+      "/ Epochs Versicolor= ", ada_versicolor.epochs,
+      "/ Epochs Virginica= ", ada_virginica.epochs)
+print("Eta Setosa= ", ada_setosa.eta,
+      "/ Eta Versicolor= ", ada_versicolor.eta,
+      "/ Eta Virginica= ", ada_virginica.eta)
+print(result_list[:10])
+print(result_list[10:20])
+print(result_list[20:30])
 # oczywiście można by zrobić, że do każdego kwiatu testowego wypisuje, z jakim błędem stwierdza, że to to lub nie to,
 # ale nie było to wymagane w zadaniu

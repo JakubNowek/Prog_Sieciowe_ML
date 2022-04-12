@@ -71,30 +71,39 @@ X_test_std = np.copy(X_test)
 X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
 X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 # część wykonawcza
-ada = AdalineSGD(epochs=15, eta=0.01)
+ada = AdalineSGD(epochs=10, eta=0.01)
 # train and adaline and plot decision regions
 ada.train(X_train_std, y_training)
+
+plt.figure(figsize=(15, 6))
+plt.subplots_adjust(wspace=0.3)
+plt.subplot(1,3,1)
+
 plot_decision_regions(X_train_std, y_training, clf=ada)
 plt.title('Adaline - Gradient Descent')
 plt.xlabel('sepal length [standardized]')
 plt.ylabel('petal length [standardized]')
-plt.show()
+#plt.show()
 
 ada_output = ada.net_input(X_test_std)  # o(x)
-#print(ada_output)
+
+plt.subplot(1,3,2)
 plt.plot(range(1, len(ada_output)+1), ada_output, marker='o')
 plt.title('Adaline - o(x) dla z ze zboru walidacyjnego')
 plt.xlabel('indeks x ze zbioru walidacyjnego')
 plt.ylabel('o(x)')
-plt.show()
+#plt.show()
 
 # testowanie
+plt.subplot(1,3,3)
 print(ada.predict(X_test_std))
-
 plt.plot(range(1, len(ada.cost_)+1), ada.cost_, marker='o')
 plt.title('Wartość błędu w zależności od ilości iteracji')
 plt.xlabel('Ilość iteracji')
 plt.ylabel('Sum-squared-error')
+
+tytul = "Model Adaline dla: epochs = {0}, eta = {1}". format(ada.epochs, ada.eta)
+plt.suptitle(tytul)
 plt.show()
 
 # plt.figure(figsize=(12, 6))

@@ -57,7 +57,7 @@ df_test = pd.concat((test_df_set, test_df_ver, test_df_vir), ignore_index=True) 
 # setosa vs versicolor and virginica
 
 y_training = df_training.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
-y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+y_training = np.where(y_training == 'Iris-versicolor', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 
 # sepal length and petal length
  # pobieranie długości kielicha i płatka (kolumny 0 i 2)
