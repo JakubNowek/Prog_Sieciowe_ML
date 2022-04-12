@@ -57,7 +57,7 @@ flower_class = 'Iris-virginica'
 short_for_class = flower_class[5:8]
 # setosa vs versicolor i virginica
 y_training = df_training.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
-y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+y_training = np.where(y_training == flower_class, -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 
 # Tworzenie zbioru treningowego i testowego - pobieranie długości kielicha i płatka (kolumny 0 i 2)
 X_training = df_training.iloc[0:120, [0, 1, 2, 3]].values
@@ -77,42 +77,44 @@ X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 X_test_std[:, 2] = (X_test[:, 2] - X_test[:, 2].mean()) / X_test[:, 2].std()
 X_test_std[:, 3] = (X_test[:, 3] - X_test[:, 3].mean()) / X_test[:, 3].std()
 # część wykonawcza
-ada = AdalineSGD(epochs=100, eta=0.01)
+ada = AdalineSGD(epochs=10, eta=0.0001)
 # train and adaline and plot decision regions
 ada.train(X_train_std, y_training)
 
-# plt.figure(figsize=(15, 6))
-# plt.subplots_adjust(wspace=0.3)
-# plt.subplot(1,3,1)
-
-# plot_decision_regions(X_train_std, y_training, clf=ada)
-# plt.title('Adaline - Gradient Descent')
-# plt.xlabel('sepal length [standardized]')
-# plt.ylabel('petal length [standardized]')
-#plt.show()
+plt.figure(figsize=(15, 6))
+plt.subplots_adjust(wspace=0.3)
+plt.subplot(1, 2, 1)
 
 ada_output = ada.net_input(X_test_std)  # o(x)
 
-# plt.subplot(1,3,2)
-# plt.plot(range(1, len(ada_output)+1), ada_output, marker='o')
-# plt.title('Adaline - o(x) dla z ze zboru walidacyjnego')
-# plt.xlabel('indeks x ze zbioru walidacyjnego')
-# plt.ylabel('o(x)')
+# plt.subplot(1,2,1)
+plt.plot(range(1, len(ada_output)+1), ada_output, marker='o')
+plt.title('Adaline - o(x) dla z ze zboru walidacyjnego')
+plt.xlabel('indeks x ze zbioru walidacyjnego')
+plt.ylabel('o(x)')
 #plt.show()
 
 # testowanie
-#plt.subplot(1,3,3)
-print(ada.predict(X_test_std))
-wynik = np.where(ada.predict(X_test_std) == -1, short_for_class, 'other')
-print(wynik)
-# plt.plot(range(1, len(ada.cost_)+1), ada.cost_, marker='o')
-# plt.title('Wartość błędu w zależności od ilości iteracji')
-# plt.xlabel('Ilość iteracji')
-# plt.ylabel('Sum-squared-error')
-#
-# tytul = "Model Adaline dla: epochs = {0}, eta = {1}". format(ada.epochs, ada.eta)
-# plt.suptitle(tytul)
-# plt.show()
 
-# plt.figure(figsize=(12, 6))
-# plt.subplots_adjust(wspace=0.4)
+
+wynik = list(np.where(ada.predict(X_test_std) == -1, short_for_class, 'other'))
+
+
+plt.subplot(1,2,2)
+plt.plot(range(1, len(ada.cost_)+1), ada.cost_, marker='o')
+plt.title('Wartość błędu w zależności od ilości iteracji')
+plt.xlabel('Ilość iteracji')
+plt.ylabel('Sum-squared-error')
+
+tytul = "Model Adaline dla: epochs = {0}, eta = {1}". format(ada.epochs, ada.eta)
+plt.suptitle(tytul)
+plt.show()
+
+print("Epochs = ", ada.epochs, "Eta = ", ada.eta)
+print("Co przewidział klasyfikator")
+print(list(ada.predict(X_test_std)))
+print('Wynik:')
+print(wynik[:10])
+print(wynik[10:20])
+print(wynik[20:30])
+

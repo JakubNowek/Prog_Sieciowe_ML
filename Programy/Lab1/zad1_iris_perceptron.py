@@ -55,7 +55,7 @@ test_df_vir = df.iloc[140:150]
 df_test = pd.concat((test_df_set, test_df_ver, test_df_vir), ignore_index=True)  # zbiór testowy 10x10x10
 
 # pick flower
-flower_class = 'Iris-virginica'
+flower_class = 'Iris-versicolor'
 short_for_class = flower_class[5:8]
 
 # setosa vs versicolor and virginica
@@ -67,30 +67,34 @@ y_training = np.where(y_training == flower_class, -1, 1)  # jeśli 'Iris-setosa'
 X_training = df_training.iloc[0:120, [0, 1, 2, 3]].values
 X_test = df_test.iloc[0:30, [0, 1, 2, 3]].values
 
-ppn = Perceptron(epochs=100, eta=0.01)  # tworzenie nowego perceptronu
+ppn = Perceptron(epochs=10000, eta=0.1)  # tworzenie nowego perceptronu
 ppn.train(X_training, y_training)
 
 
-# plt.figure(figsize=(12, 6))
-# plt.subplots_adjust(wspace=0.4)
-# plt.subplot(1,2,1)
-# print('Weights: %s' % ppn.w_)
+plt.figure(figsize=(6, 6))
+
+print('Weights: %s' % ppn.w_)
 # plot_decision_regions(X_training, y_training, clf=ppn)
 # plt.title('Perceptron')
 # plt.xlabel('sepal length [cm]')
 # plt.ylabel('petal length [cm]')
-# # plt.show()
-#
-# plt.subplot(1,2,2)
-# plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
-# plt.xlabel('Iterations')
-# plt.ylabel('Misclassifications')
-#
-# tytul = "Model perceptronu dla: epochs = {0}, eta = {1}". format(ppn.epochs, ppn.eta)
-# plt.suptitle(tytul)
 # plt.show()
 
+plt.plot(range(1, len(ppn.errors_)+1), ppn.errors_, marker='o')
+plt.xlabel('Iterations')
+plt.ylabel('Misclassifications')
+plt.title("Model perceptronu dla: epochs = {0}, eta = {1}". format(ppn.epochs, ppn.eta))
+
+#tytul = "Model perceptronu dla: epochs = {0}, eta = {1}". format(ppn.epochs, ppn.eta)
+
+plt.show()
+
 # testowanie nauczonego perceptronu
-print(ppn.predict(X_test))
-wynik = np.where(ppn.predict(X_test) == -1, short_for_class, 'other')
-print(wynik)
+print("Epochs = ", ppn.epochs, "Eta = ", ppn.eta)
+print("Co przewidział klasyfikator")
+print(list(ppn.predict(X_test)))
+wynik = list(np.where(ppn.predict(X_test) == -1, short_for_class, 'other'))
+print('Wynik:')
+print(wynik[:10])
+print(wynik[10:20])
+print(wynik[20:30])

@@ -85,7 +85,7 @@ X_test_std[:, 3] = (X_test[:, 3] - X_test[:, 3].mean()) / X_test[:, 3].std()
 # tworzenie 3 klasyfikatorów
 ada_setosa = AdalineSGD(epochs=10, eta=0.01)
 ada_versicolor = AdalineSGD(epochs=1000, eta=0.001)
-ada_virginica = AdalineSGD(epochs=1000, eta=0.001)
+ada_virginica = AdalineSGD(epochs=100, eta=0.001)
 
 # train and adaline and plot decision regions
 ada_setosa.train(X_train_std, y_tr_setosa)
