@@ -54,7 +54,7 @@ df_test = pd.concat((test_df_set, test_df_ver, test_df_vir), ignore_index=True) 
 
 # setosa vs versicolor i virginica
 y_training = df_training.iloc[0:120, 4].values  # 100 elementów z 4 kolumny (numeracja od 0) czyli kolumny z nazwą
-y_training = np.where(y_training == 'Iris-setosa', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
+y_training = np.where(y_training == 'Iris-virginica', -1, 1)  # jeśli 'Iris-setosa' zwróć -1, jeśli nie daj 1
 
 # Tworzenie zbioru treningowego i testowego - pobieranie długości kielicha i płatka (kolumny 0 i 2)
 X_training = df_training.iloc[0:120, [0, 2]].values
@@ -71,7 +71,7 @@ X_test_std = np.copy(X_test)
 X_test_std[:, 0] = (X_test[:, 0] - X_test[:, 0].mean()) / X_test[:, 0].std()
 X_test_std[:, 1] = (X_test[:, 1] - X_test[:, 1].mean()) / X_test[:, 1].std()
 # część wykonawcza
-ada = AdalineSGD(epochs=10, eta=0.01)
+ada = AdalineSGD(epochs=1000, eta=0.01)
 # train and adaline and plot decision regions
 ada.train(X_train_std, y_training)
 
