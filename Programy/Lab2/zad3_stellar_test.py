@@ -26,64 +26,75 @@ def to_image(vector):
     return vector
 
 
+pd.set_option("display.max_columns", None,
+              "max_colwidth", None, "display.expand_frame_repr", False)
+np.set_printoptions(linewidth=150)
+
 # ignorowanie warningów (pisało dużo razy, że nie zdążył zbiec)
 # warnings.filterwarnings('ignore')
 
-# ładowanie zestawu danych mnist
-(train_X, train_y), (test_X, test_y) = mnist.load_data()
 
-# shape of dataset
-print('X_train: ' + str(train_X.shape))
-print('Y_train: ' + str(train_y.shape))
-print('X_test:  ' + str(test_X.shape))
-print('Y_test:  ' + str(test_y.shape))
+# wczytywanie csv
+stellar_df = pd.read_csv('star_classification.csv')
 
-# reshaping np arrays to np vectors
-train_X = reshape(train_X)
-#Y_train = reshape(train_y)
-test_X = reshape(test_X)
-#Y_test = reshape(test_y)
-print("Reshaping finished:")
-print('X_train: ' + str(train_X.shape))
-print('X_test:  ' + str(test_X.shape))
+stellar_df = stellar_df[['alpha', 'delta', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift']]
+# print(stellar_df.head())
+print("Wczytano bazę.")
 
-clf = load('mnist_mod.joblib')
+# podział zestawu na klasy
+galaxy = stellar_df[stellar_df['class'] == 'GALAXY']
+star = stellar_df[stellar_df['class'] == 'STAR']
+qso = stellar_df[stellar_df['class'] == 'QSO']
+
+# galaxy = galaxy.reset_index(drop=True)
+# star = star.reset_index(drop=True)
+# qso = qso.reset_index(drop=True)
+
+galaxy = galaxy.sample(10100).drop(labels='class', axis='columns')
+star = star.sample(10100).drop(labels='class', axis='columns')
+qso = qso.sample(10100).drop(labels='class', axis='columns')
+
+
+# wyjścia zbioru treningowego
+galaxy_target = np.array([0]*10100)
+star_target = np.array([1]*10100)
+qso_target = np.array([2]*10100)
+
+# zbiór treningowy
+stel_tr = np.concatenate([galaxy[:10000], star[:10000], qso[:10000]])
+stel_tr_target = np.concatenate((galaxy_target[:10000], star_target[:10000], qso_target[:10000]))
+# print(stel_tr.shape)
+# print(stel_tr_target.shape)
+
+# zbiór testowy
+stel_test = np.concatenate([galaxy[10000:10100], star[10000:10100], qso[10000:10100]])
+stel_test_real = np.concatenate((galaxy_target[10000:10100], star_target[10000:10100], qso_target[10000:10100]))
+
+#ładowanie klasyfikatora
+clf = load('stellar_mod.joblib')
 # wypisywanie najlepszych znalezionych parametrów
-print("Parametry: \n",clf.get_params())
+modelParams = pd.Series(clf.get_params())
+print("Parametry: \n", modelParams)
 # ustawienie widoczności całego DataFrame'a
 cvResultsDF = pd.DataFrame(clf.cv_results_)
 pd.set_option("display.max_rows", None,"display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
-np.set_printoptions(linewidth=150)
+np.set_printoptions(linewidth=None)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
 print("Grid search results: \n", cvResultsDF)
 
-# wydzielanie fragmentu ze zbioru testowego i predykcja
-slice_to_test = test_X[:10]
-answer_to_test = test_y[:10]
-mnist_pred = clf.predict(slice_to_test)
+# przewidywanie
+iris_pred = clf.predict(stel_test)
 #macierz pomyłek
-cm = confusion_matrix(mnist_pred, answer_to_test)
-print("Prediction output: \n", mnist_pred)
+cm = confusion_matrix(iris_pred, stel_test_real)
+print("Prediction output: \n", iris_pred)
 print("Confusion matrix: \n", cm)
 
 np.set_printoptions(suppress=True)  # nie chcemy naukowej notacji, tylko float ładny
-probability = clf.predict_proba(slice_to_test)*100
-print("\nPrediction probability for test set: \n", probability)
-pred_proba = np.amax(probability, axis=1)
-print("\nBest approximation: \n", pred_proba)
+print("Prediction probability for test set: \n", clf.predict_proba(stel_test)*100)
 plt.matshow(cm)
 plt.title('Confusion matrix')
 plt.colorbar()
 plt.ylabel('True label')
 plt.xlabel('Predicted label')
-plt.show()
-
-# wyświetlanie rzeczywistych obrazów
-fig = plt.figure(figsize=(8, 8))
-columns = 5
-rows = 2
-for i in range(1, columns*rows + 1):
-    fig.add_subplot(rows, columns, i)
-    plt.imshow(to_image(slice_to_test[i-1]), cmap=plt.get_cmap('gray'))
 plt.show()

@@ -18,6 +18,7 @@ iris = datasets.load_iris()
 iris_tr = np.concatenate([iris.data[:40], iris.data[50:90], iris.data[100:140]])
 iris_tr_target = np.concatenate([iris.target[:40], iris.target[50:90], iris.target[100:140]])
 
+
 # zbiór testowy
 iris_test = np.concatenate([iris.data[40:50], iris.data[90:100], iris.data[140:150]])
 iris_test_real = np.concatenate([iris.target[40:50], iris.target[90:100], iris.target[140:150]])

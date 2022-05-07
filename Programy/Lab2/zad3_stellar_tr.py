@@ -11,21 +11,7 @@ import pandas as pd
 import warnings
 from joblib import dump, load
 
-def reshape(set_of_arrays):
-    list_of_vectors = []
-    for array in set_of_arrays:
-        vector = np.reshape(array, -1)
-        list_of_vectors.append(vector)
-    return np.array(list_of_vectors)
-
-# podajemy np.array 1xn i otrzymujemy podzieloną np.array 28x28
-def to_image(vector):
-    vector = vector.tolist()
-    vector = [vector[x:x+28] for x in range(0, len(vector), 28)]
-    vector = np.array(vector)
-    return vector
-
-pd.set_option("display.max_rows", None,"display.max_columns", None,
+pd.set_option("display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=150)
 
@@ -45,62 +31,40 @@ galaxy = stellar_df[stellar_df['class'] == 'GALAXY']
 star = stellar_df[stellar_df['class'] == 'STAR']
 qso = stellar_df[stellar_df['class'] == 'QSO']
 
+# galaxy = galaxy.reset_index(drop=True)
+# star = star.reset_index(drop=True)
+# qso = qso.reset_index(drop=True)
 
-# ładowanie zestawu danych mnist
-# (train_X, train_y), (test_X, test_y) = mnist.load_data()
-#
-# # shape of dataset
-# print('X_train: ' + str(train_X.shape))
-# print('Y_train: ' + str(train_y.shape))
-# print('X_test:  ' + str(test_X.shape))
-# print('Y_test:  ' + str(test_y.shape))
-#
-# # reshaping np arrays to np vectors
-# train_X = reshape(train_X)
-# #Y_train = reshape(train_y)
-# test_X = reshape(test_X)
-# #Y_test = reshape(test_y)
-# print("Reshaping finished:")
-# print('X_train: ' + str(train_X.shape))
-# print('X_test:  ' + str(test_X.shape))
-#
-# clf = load('mnist_mod.joblib')
-# # wypisywanie najlepszych znalezionych parametrów
-# print("Parametry: \n",clf.get_params())
-# # ustawienie widoczności całego DataFrame'a
-# cvResultsDF = pd.DataFrame(clf.cv_results_)
-# pd.set_option("display.max_rows", None,"display.max_columns", None,
-#               "max_colwidth", None, "display.expand_frame_repr", False)
-# np.set_printoptions(linewidth=150)
-# # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
-# print("Grid search results: \n", cvResultsDF)
-#
-# # wydzielanie fragmentu ze zbioru testowego i predykcja
-# slice_to_test = test_X[:10]
-# answer_to_test = test_y[:10]
-# mnist_pred = clf.predict(slice_to_test)
-# #macierz pomyłek
-# cm = confusion_matrix(mnist_pred, answer_to_test)
-# print("Prediction output: \n", mnist_pred)
-# print("Confusion matrix: \n", cm)
-#
-# np.set_printoptions(suppress=True)  # nie chcemy naukowej notacji, tylko float ładny
-# probability = clf.predict_proba(slice_to_test)*100
-# print("\nPrediction probability for test set: \n", probability)
-# pred_proba = np.amax(probability, axis=1)
-# print("\nBest approximation: \n", pred_proba)
-# plt.matshow(cm)
-# plt.title('Confusion matrix')
-# plt.colorbar()
-# plt.ylabel('True label')
-# plt.xlabel('Predicted label')
-# plt.show()
-#
-# # wyświetlanie rzeczywistych obrazów
-# fig = plt.figure(figsize=(8, 8))
-# columns = 5
-# rows = 2
-# for i in range(1, columns*rows + 1):
-#     fig.add_subplot(rows, columns, i)
-#     plt.imshow(to_image(slice_to_test[i-1]), cmap=plt.get_cmap('gray'))
-# plt.show()
+galaxy = galaxy.sample(10100).drop(labels='class', axis='columns')
+star = star.sample(10100).drop(labels='class', axis='columns')
+qso = qso.sample(10100).drop(labels='class', axis='columns')
+
+
+# wyjścia zbioru treningowego
+galaxy_target = np.array([0]*10100)
+star_target = np.array([1]*10100)
+qso_target = np.array([2]*10100)
+
+# zbiór treningowy
+stel_tr = np.concatenate([galaxy[:10000], star[:10000], qso[:10000]])
+stel_tr_target = np.concatenate((galaxy_target[:10000], star_target[:10000], qso_target[:10000]))
+# print(stel_tr.shape)
+# print(stel_tr_target.shape)
+
+# zbiór testowy
+stel_test = np.concatenate([galaxy[10000:10100], star[10000:10100], qso[10000:10100]])
+stel_test_real = np.concatenate((galaxy_target[10000:10100], star_target[10000:10100], qso_target[10000:10100]))
+
+# tworzenie wielowarstwowego perceptronu
+mlp = MLPClassifier(activation='tanh', learning_rate='constant', max_iter=50)
+parameters = {
+    'hidden_layer_sizes': [60,80,100],
+    'solver': ['adam'],
+    'learning_rate_init': [0.1, 0.01, 0.001]
+}
+mlp.out_activation_ = 'softmax'
+clf = GridSearchCV(mlp, parameters)
+
+# trenowanie
+clf.fit(stel_tr, stel_tr_target)
+dump(clf, 'stellar_mod.joblib')
