@@ -39,7 +39,6 @@ print('X_test:  ' + str(test_X.shape))
 print('Y_test:  ' + str(test_y.shape))
 
 
-
 # reshaping np arrays to np vectors
 train_X = reshape(train_X)
 #Y_train = reshape(train_y)

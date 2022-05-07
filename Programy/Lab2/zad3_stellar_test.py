@@ -1,54 +1,30 @@
 import tensorflow
 from keras.datasets import mnist
 from sklearn.neural_network import MLPClassifier
-from sklearn import datasets
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import confusion_matrix
 import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import warnings
 from joblib import dump, load
-
-def reshape(set_of_arrays):
-    list_of_vectors = []
-    for array in set_of_arrays:
-        vector = np.reshape(array, -1)
-        list_of_vectors.append(vector)
-    return np.array(list_of_vectors)
-
-# podajemy np.array 1xn i otrzymujemy podzieloną np.array 28x28
-def to_image(vector):
-    vector = vector.tolist()
-    vector = [vector[x:x+28] for x in range(0, len(vector), 28)]
-    vector = np.array(vector)
-    return vector
-
 
 pd.set_option("display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=150)
 
-# ignorowanie warningów (pisało dużo razy, że nie zdążył zbiec)
-# warnings.filterwarnings('ignore')
-
-
 # wczytywanie csv
 stellar_df = pd.read_csv('star_classification.csv')
 
+# wybranie tylko istotnych kolumn
 stellar_df = stellar_df[['alpha', 'delta', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift']]
-# print(stellar_df.head())
-print("Wczytano bazę.")
+print("Wczytano bazę.\n")
 
 # podział zestawu na klasy
 galaxy = stellar_df[stellar_df['class'] == 'GALAXY']
 star = stellar_df[stellar_df['class'] == 'STAR']
 qso = stellar_df[stellar_df['class'] == 'QSO']
 
-# galaxy = galaxy.reset_index(drop=True)
-# star = star.reset_index(drop=True)
-# qso = qso.reset_index(drop=True)
 
 galaxy = galaxy.sample(10100).drop(labels='class', axis='columns')
 star = star.sample(10100).drop(labels='class', axis='columns')

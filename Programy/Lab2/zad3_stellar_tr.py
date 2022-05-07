@@ -1,3 +1,7 @@
+#fedesoriano. (January 2022). Stellar Classification Dataset - SDSS17.
+# Retrieved [Date Retrieved] from https://www.kaggle.com/fedesoriano/stellar-classification-dataset-sdss17.
+# Classification of Stars, Galaxies and Quasars. Sloan Digital Sky Survey DR17
+
 import tensorflow
 from keras.datasets import mnist
 from sklearn.neural_network import MLPClassifier
@@ -16,7 +20,7 @@ pd.set_option("display.max_columns", None,
 np.set_printoptions(linewidth=150)
 
 # ignorowanie warningów (pisało dużo razy, że nie zdążył zbiec)
-# warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 
 # wczytywanie csv
@@ -24,7 +28,7 @@ stellar_df = pd.read_csv('star_classification.csv')
 
 stellar_df = stellar_df[['alpha', 'delta', 'u', 'g', 'r', 'i', 'z', 'class', 'redshift']]
 # print(stellar_df.head())
-print("Wczytano bazę.")
+print("Wczytano bazę.\n")
 
 # podział zestawu na klasy
 galaxy = stellar_df[stellar_df['class'] == 'GALAXY']
