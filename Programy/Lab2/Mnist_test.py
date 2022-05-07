@@ -57,10 +57,12 @@ pd.set_option("display.max_rows", None,"display.max_columns", None,
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
 print("Grid search results: \n", cvResultsDF)
 
-
-mnist_pred = clf.predict(test_X[:10])
+# wydzielanie fragmentu ze zbioru testowego i predykcja
+slice_to_test = test_X[:10]
+answer_to_test = test_y[:10]
+mnist_pred = clf.predict(slice_to_test)
 #macierz pomyłek
-cm = confusion_matrix(mnist_pred, test_y[:10])
+cm = confusion_matrix(mnist_pred, answer_to_test)
 print("Prediction output: \n", mnist_pred)
 print("Confusion matrix: \n", cm)
 
@@ -73,9 +75,11 @@ plt.ylabel('True label')
 plt.xlabel('Predicted label')
 plt.show()
 
-# print(to_image(test_X[0]))
-
-for i in range(9):
-    plt.subplot(330 + 1 + i)
-    plt.imshow(to_image(test_X[i]), cmap=plt.get_cmap('gray'))
+# wyświetlanie rzeczywistych obrazów
+fig = plt.figure(figsize=(8, 8))
+columns = 5
+rows = 2
+for i in range(1, columns*rows +1):
+    fig.add_subplot(rows, columns, i)
+    plt.imshow(to_image(slice_to_test[i-1]), cmap=plt.get_cmap('gray'))
 plt.show()
