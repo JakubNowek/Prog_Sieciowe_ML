@@ -41,6 +41,7 @@ print("Parametry: \n",clf.get_params())
 cvResultsDF = pd.DataFrame(clf.cv_results_)
 pd.set_option("display.max_rows", None,"display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
+np.set_printoptions(linewidth=None)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
 print("Grid search results: \n", cvResultsDF)
 
