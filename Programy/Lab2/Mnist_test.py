@@ -54,6 +54,7 @@ print("Parametry: \n",clf.get_params())
 cvResultsDF = pd.DataFrame(clf.cv_results_)
 pd.set_option("display.max_rows", None,"display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
+np.set_printoptions(linewidth=150)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
 print("Grid search results: \n", cvResultsDF)
 
@@ -67,7 +68,10 @@ print("Prediction output: \n", mnist_pred)
 print("Confusion matrix: \n", cm)
 
 np.set_printoptions(suppress=True)  # nie chcemy naukowej notacji, tylko float ładny
-#print("Prediction probability for test set: \n", clf.predict_proba(mnist_pred)*100)
+probability = clf.predict_proba(slice_to_test)*100
+print("\nPrediction probability for test set: \n", probability)
+pred_proba = np.amax(probability, axis=1)
+print("\nBest approximation: \n", pred_proba)
 plt.matshow(cm)
 plt.title('Confusion matrix')
 plt.colorbar()
@@ -79,7 +83,7 @@ plt.show()
 fig = plt.figure(figsize=(8, 8))
 columns = 5
 rows = 2
-for i in range(1, columns*rows +1):
+for i in range(1, columns*rows + 1):
     fig.add_subplot(rows, columns, i)
     plt.imshow(to_image(slice_to_test[i-1]), cmap=plt.get_cmap('gray'))
 plt.show()
