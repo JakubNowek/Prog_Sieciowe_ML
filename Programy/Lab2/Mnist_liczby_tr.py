@@ -21,7 +21,7 @@ def reshape(set_of_arrays):
     return np.array(list_of_vectors)
 
 # ignorowanie warningów (pisało dużo razy, że nie zdążył zbiec)
-# warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 # ładowanie zestawu danych mnist
 (train_X, train_y), (test_X, test_y) = mnist.load_data()
@@ -44,8 +44,8 @@ print('X_test:  ' + str(test_X.shape))
 mlp = MLPClassifier(activation='tanh', learning_rate='constant', max_iter=20)
 parameters = {
     'hidden_layer_sizes': [20,40,60,80,100],
-    'solver': ['adam'],
-    'learning_rate_init': [0.01, 0.001]
+    'solver': ['sgd'],
+    'learning_rate_init': [0.1, 0.01, 0.001]
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
@@ -54,4 +54,4 @@ clf = GridSearchCV(mlp, parameters)
 print("Training...")
 clf.fit(train_X, train_y)
 # zapisywanie wytrenowanego modelu
-dump(clf, 'mnist_mod.joblib')
+dump(clf, 'mnist_jelba.joblib')
