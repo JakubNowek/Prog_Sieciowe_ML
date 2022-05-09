@@ -47,10 +47,17 @@ parameters = {
     'solver': ['adam'],
     'learning_rate_init': [0.1, 0.01, 0.001]
 }
+# mlp = MLPClassifier(activation='tanh', learning_rate='constant', max_iter=200)
+# parameters = {
+#     'hidden_layer_sizes': [100],
+#     'solver': ['adam'],
+#     'learning_rate_init': [0.001]
+#
+# }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
 # trenowanie
 print("Training...")
 clf.fit(train_X, train_y)
 # zapisywanie wytrenowanego modelu
-dump(clf, 'mnist_mod_ugabuganiendpisuj.joblib')
+dump(clf, 'modele/mnist_mod_urrrrrrrr.joblib')
