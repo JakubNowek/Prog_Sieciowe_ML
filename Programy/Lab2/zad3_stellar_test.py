@@ -47,7 +47,7 @@ stel_test = np.concatenate([galaxy[10000:10100], star[10000:10100], qso[10000:10
 stel_test_real = np.concatenate((galaxy_target[10000:10100], star_target[10000:10100], qso_target[10000:10100]))
 
 #ładowanie klasyfikatora
-clf = load('stellar_mod_adam.joblib')
+clf = load('modele/stellar_mod_adam.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 modelParams = pd.Series(clf.get_params())
 print("Parametry: \n", modelParams)

@@ -48,7 +48,7 @@ print("Reshaping finished:")
 print('X_train: ' + str(train_X.shape))
 print('X_test:  ' + str(test_X.shape))
 
-clf = load('mnist_mod_sgd.joblib')
+clf = load('modele/mnist_mod_sgd.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a

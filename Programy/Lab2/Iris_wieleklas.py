@@ -35,7 +35,7 @@ clf = GridSearchCV(mlp, parameters)
 
 # trenowanie
 clf.fit(iris_tr, iris_tr_target)
-dump(clf, 'irysmodeltest.joblib')
+dump(clf, 'modele/irysmodeltest.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a

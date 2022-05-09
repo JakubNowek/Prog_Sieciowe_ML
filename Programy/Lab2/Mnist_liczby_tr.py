@@ -49,7 +49,6 @@ parameters = {
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
-clf.out_activation_ = 'softmax'
 # trenowanie
 print("Training...")
 clf.fit(train_X, train_y)

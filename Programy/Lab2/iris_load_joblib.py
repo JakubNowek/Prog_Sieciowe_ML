@@ -23,7 +23,7 @@ iris_tr_target = np.concatenate([iris.target[:40], iris.target[50:90], iris.targ
 iris_test = np.concatenate([iris.data[40:50], iris.data[90:100], iris.data[140:150]])
 iris_test_real = np.concatenate([iris.target[40:50], iris.target[90:100], iris.target[140:150]])
 
-clf = load('irysmodeltest.joblib')
+clf = load('modele/irysmodeltest.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a

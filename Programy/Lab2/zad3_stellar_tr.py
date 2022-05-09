@@ -63,12 +63,11 @@ stel_test_real = np.concatenate((galaxy_target[10000:10100], star_target[10000:1
 mlp = MLPClassifier(activation='tanh', learning_rate='constant', max_iter=50)
 parameters = {
     'hidden_layer_sizes': [20,40,60,80,100],
-    'solver': ['adam'],
+    'solver': ['lbfgs'],
     'learning_rate_init': [0.1, 0.01, 0.001]
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
-clf.out_activation_ = 'softmax'
 # trenowanie
 clf.fit(stel_tr, stel_tr_target)
-dump(clf, 'stellar_mod_adam.joblib')
+dump(clf, 'modele/stellar_mod_lbfgs.joblib')
