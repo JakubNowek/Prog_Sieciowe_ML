@@ -48,7 +48,7 @@ print("Reshaping finished:")
 print('X_train: ' + str(train_X.shape))
 print('X_test:  ' + str(test_X.shape))
 
-clf = load('mnist_jelba_lbfgs.joblib')
+clf = load('mnist_mod_adam100_100_.001.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a

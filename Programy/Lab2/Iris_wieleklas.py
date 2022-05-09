@@ -27,7 +27,7 @@ iris_test_real = np.concatenate([iris.target[40:50], iris.target[90:100], iris.t
 mlp = MLPClassifier(activation='tanh', learning_rate='constant')
 parameters = {
     'hidden_layer_sizes': [20,40,60,80,100],
-    'solver': ['adam'],
+    'solver': ['lbfgs'],
     'learning_rate_init': [0.01, 0.001]
 }
 mlp.out_activation_ = 'softmax'

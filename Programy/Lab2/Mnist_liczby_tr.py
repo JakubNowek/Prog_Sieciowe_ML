@@ -44,14 +44,14 @@ print('X_test:  ' + str(test_X.shape))
 mlp = MLPClassifier(activation='tanh', learning_rate='constant', max_iter=20)
 parameters = {
     'hidden_layer_sizes': [20,40,60,80,100],
-    'solver': ['sgd'],
+    'solver': ['adam'],
     'learning_rate_init': [0.1, 0.01, 0.001]
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
-
+clf.out_activation_ = 'softmax'
 # trenowanie
 print("Training...")
 clf.fit(train_X, train_y)
 # zapisywanie wytrenowanego modelu
-dump(clf, 'mnist_jelba.joblib')
+dump(clf, 'mnist_mod_ugabuganiendpisuj.joblib')

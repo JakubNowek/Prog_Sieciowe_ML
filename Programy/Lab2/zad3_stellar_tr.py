@@ -68,7 +68,7 @@ parameters = {
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
-
+clf.out_activation_ = 'softmax'
 # trenowanie
 clf.fit(stel_tr, stel_tr_target)
-dump(clf, 'stellar_mod.joblib')
+dump(clf, 'stellar_mod_soft.joblib')
