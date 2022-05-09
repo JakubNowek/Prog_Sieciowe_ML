@@ -48,7 +48,7 @@ print("Reshaping finished:")
 print('X_train: ' + str(train_X.shape))
 print('X_test:  ' + str(test_X.shape))
 
-clf = load('mnist_mod_adam100_100_.001.joblib')
+clf = load('mnist_mod_sgd.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a
@@ -57,7 +57,8 @@ pd.set_option("display.max_rows", None,"display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=150)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
-print("Grid search results: \n", cvResultsDF)
+#print("Grid search results: \n", cvResultsDF)
+print("Grid search results: \n", cvResultsDF[["params", "mean_test_score","rank_test_score"]])
 
 # wydzielanie fragmentu ze zbioru testowego i predykcja
 slice_to_test = test_X[:10]

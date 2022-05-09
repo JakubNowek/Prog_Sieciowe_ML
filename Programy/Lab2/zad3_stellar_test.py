@@ -47,7 +47,7 @@ stel_test = np.concatenate([galaxy[10000:10100], star[10000:10100], qso[10000:10
 stel_test_real = np.concatenate((galaxy_target[10000:10100], star_target[10000:10100], qso_target[10000:10100]))
 
 #ładowanie klasyfikatora
-clf = load('stellar_mod_one.joblib')
+clf = load('stellar_mod_adam.joblib')
 # wypisywanie najlepszych znalezionych parametrów
 modelParams = pd.Series(clf.get_params())
 print("Parametry: \n", modelParams)
@@ -57,8 +57,8 @@ pd.set_option("display.max_rows", None,"display.max_columns", None,
               "max_colwidth", None, "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=None)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
-print("Grid search results: \n", cvResultsDF)
-
+#print("Grid search results: \n", cvResultsDF)
+print("Grid search results: \n", cvResultsDF[["params", "mean_test_score","rank_test_score"]])
 # przewidywanie
 iris_pred = clf.predict(stel_test)
 #macierz pomyłek

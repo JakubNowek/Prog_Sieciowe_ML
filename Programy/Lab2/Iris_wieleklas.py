@@ -26,9 +26,9 @@ iris_test_real = np.concatenate([iris.target[40:50], iris.target[90:100], iris.t
 # tworzenie wielowarstwowego perceptronu
 mlp = MLPClassifier(activation='tanh', learning_rate='constant')
 parameters = {
-    'hidden_layer_sizes': [20,40,60,80,100],
-    'solver': ['lbfgs'],
-    'learning_rate_init': [0.01, 0.001]
+    'hidden_layer_sizes': [2, 3, 4, 5],
+    'solver': ['adam','lbfgs'],
+    'learning_rate_init': [0.1, 0.01]
 }
 mlp.out_activation_ = 'softmax'
 clf = GridSearchCV(mlp, parameters)
@@ -41,10 +41,12 @@ print("Parametry: \n",clf.get_params())
 # ustawienie widoczności całego DataFrame'a
 cvResultsDF = pd.DataFrame(clf.cv_results_)
 pd.set_option("display.max_rows", None,"display.max_columns", None,
-              "max_colwidth", None, "display.expand_frame_repr", False)
+              "display.max_colwidth", None, "display.expand_frame_repr", False)
+
 np.set_printoptions(linewidth=None)
 # cvresult wypisuje wszystkie możliwości, więc będzie tyle wierszy ile możliwości, czyli tutaj
-print("Grid search results: \n", cvResultsDF)
+#print("Grid search results: \n", cvResultsDF)
+print("Grid search results: \n", cvResultsDF[["params", "mean_test_score","rank_test_score"]])
 
 # przewidywanie
 iris_pred = clf.predict(iris_test)
