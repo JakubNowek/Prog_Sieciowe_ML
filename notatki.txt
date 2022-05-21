@@ -1,0 +1,13 @@
+perceptron z 1 warstwą ukrytą może aproksymować dowolną funkcję ciągłą (jeśli tylko mamy dowolnie dużo neuronów)
+
+my będziemy tu aproksymować funkcję jedno wyjście, ileś wejść.
+fajnie by byłojakbyśmy uzyskali na poziomie kilku procent.
+1. data 2. cena otwarcia na dany dzień 3. cena zamknięcia na dany dzień 4. cena najniższa na dzień 4. cena najwyższa na dany dzień.
+Wybrać sobie jedną spółę i zamodelować cenę akcji.
+Indeksy u góry od 1 do r wskazują numer parametru.
+Wyrzucamy datę.
+K to liczba dni, które chcemy uwzględnić jako ostatnie dni (czyli w następnym dniu uwzględniaj cenę z k poprzednich dni)
+
+Treba popatrzeć, ile procent z danych możemy użyć, żeby utrzymać jakość aproksymacji średnio 5%, czyli jakie ma być K (bo K% danych do testowania)
+
+przewidujemy cenę otwarcia
