@@ -2,6 +2,7 @@ import tensorflow
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix
 import matplotlib.figure
 import matplotlib.pyplot as plt
@@ -28,12 +29,65 @@ stonks_df[['open', 'high', 'low', 'close', 'volume']] = scaler.fit_transform(sto
 
 # tworzenie zbioru treningowego z (100-K)% początkowych próbek i testowego z K% próbek końcowych
 howManyRows = len(stonks_df)
-K = 10  # ile procent danych to dane
-last_training_data = (int) (((100-K)/100)*howManyRows)
+K = 5  # ile procent danych chcemy przewidziec
+forecast_out = 1#(int)((K/100)*howManyRows)  # ile dni chcemy przewidziec
 
-stonks_tr = stonks_df[:last_training_data]
-print(stonks_tr)
-stonks_test = stonks_df[last_training_data:]
-stonks_test = stonks_test.reset_index(drop=True)
-print(stonks_test)
+last_training_data = int(((100-K)/100)*howManyRows)
+stonks_df['Prediction'] = stonks_df[['open']].shift(-forecast_out)
+#print(stonks_df)
+#stonks_tr = stonks_df[:last_training_data]
 
+# budowa wejść
+X = np.array(stonks_df.drop(columns='Prediction'))
+X_forecast = X[-forecast_out:]  # ustaw X_forecast na K% dni
+X = X[:-forecast_out]  # remove last K% from X
+#print('X\n', X)
+# budowa wyjść
+y = np.array(stonks_df['Prediction'])
+y = y[:-forecast_out]
+#print('y\n', y)
+# tworzenie zbiorów treningowych i testowych
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=K/100, shuffle=False)
+
+
+# tworzenie wielowarstwowego perceptronu
+mlp = MLPRegressor()
+
+parameters = {
+    'hidden_layer_sizes': [20, 40, 60, 80, 100],
+    'activation': ['logistic', 'tanh'],
+    'learning_rate_init': [0.1, 0.01, 0.001],
+    'learning_rate': ['constant', 'adaptive'],
+    'solver': ['adam', 'lbfgs']
+
+}
+reg = GridSearchCV(mlp, parameters)
+
+reg.fit(X_train, y_train)
+# Testing
+confidence = reg.score(X_test, y_test)
+print("confidence: ", confidence)
+
+forecast_prediction = reg.predict(X_test)
+#print('Wynik testów\n', forecast_prediction)
+#print('Tai powinien być y\n', y_test)
+cvResultsDF = pd.DataFrame(reg.cv_results_)
+cvResultsDF = cvResultsDF.sort_values(by=['mean_test_score'])
+print("Grid search results: \n", cvResultsDF[["params", "mean_test_score", "rank_test_score"]])
+print('Przewidziano na podstawie ', int((K/100)*howManyRows), ' ostatnich dni.')
+
+cm = abs(forecast_prediction - y_test)
+plt.plot(list(range(0, len(cm))), cm)
+plt.title('Błąd z - %d dni' % last_training_data)
+plt.ylabel('Wartość błędu w skali 0-1')
+plt.xlabel('Numer próbki')
+plt.show()
+
+
+plt.plot(list(range(0, len(cm))), forecast_prediction)
+plt.plot(list(range(0, len(cm))), y_test)
+plt.title(f'Przewidziane {int((K/100)*howManyRows)} dni na podstawie {last_training_data} dni')
+plt.ylabel('Przeskalowana wartość akcji')
+plt.xlabel('Numer próbki')
+plt.legend(['Predykcja', 'Wartość prawdziwa'])
+plt.show()

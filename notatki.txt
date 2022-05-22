@@ -6,8 +6,16 @@ fajnie by byłojakbyśmy uzyskali na poziomie kilku procent.
 Wybrać sobie jedną spółę i zamodelować cenę akcji.
 Indeksy u góry od 1 do r wskazują numer parametru.
 Wyrzucamy datę.
-K to liczba dni, które chcemy uwzględnić jako ostatnie dni (czyli w następnym dniu uwzględniaj cenę z k poprzednich dni)
+K% to liczba dni, które chcemy uwzględnić jako ostatnie dni (czyli w następnym dniu uwzględniaj cenę z k poprzednich dni)
 
-Treba popatrzeć, ile procent z danych możemy użyć, żeby utrzymać jakość aproksymacji średnio 5%, czyli jakie ma być K (bo K% danych do testowania)
+Trzeba popatrzeć, ile procent z danych możemy użyć, żeby utrzymać jakość aproksymacji średnio 5%, czyli jakie ma być K (bo K% danych do testowania)
 
 przewidujemy cenę otwarcia
+
+3% = 37 dni = 0.7378328946933765
+2% = 25 dni = 0.8160804418704668
+1% = 12 dni = 0.9140813678868276
+
+
+confidence:  0.9838831339832371
+[0.01176272]
