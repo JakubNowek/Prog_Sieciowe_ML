@@ -10,11 +10,13 @@ import numpy as np
 import pandas as pd
 from joblib import dump, load
 import warnings
+from statistics import median
 
 # ignorowanie warningów (pisało dużo razy, że nie zdążył zbiec)
 #warnings.filterwarnings('ignore')
 pd.set_option("display.max_columns", None,
               "max_colwidth", None,
+              'display.max_rows', None,
               "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=100)
 
@@ -29,7 +31,7 @@ stonks_df[['open', 'high', 'low', 'close', 'volume']] = scaler.fit_transform(sto
 
 # tworzenie zbioru treningowego z (100-K)% początkowych próbek i testowego z K% próbek końcowych
 howManyRows = len(stonks_df)
-K = 5  # ile procent danych chcemy przewidziec
+K = 45  # ile procent danych chcemy przewidziec
 forecast_out = 1#(int)((K/100)*howManyRows)  # ile dni chcemy przewidziec
 
 last_training_data = int(((100-K)/100)*howManyRows)
@@ -61,6 +63,13 @@ parameters = {
     'solver': ['adam', 'lbfgs']
 
 }
+
+# parameters = {'activation': ['tanh'],
+#               'hidden_layer_sizes': [60],
+#               'learning_rate': ['constant'],
+#               'learning_rate_init': [0.01],
+#               'solver': ['adam']}
+
 reg = GridSearchCV(mlp, parameters)
 
 reg.fit(X_train, y_train)
@@ -69,25 +78,40 @@ confidence = reg.score(X_test, y_test)
 print("confidence: ", confidence)
 
 forecast_prediction = reg.predict(X_test)
-#print('Wynik testów\n', forecast_prediction)
-#print('Tai powinien być y\n', y_test)
 cvResultsDF = pd.DataFrame(reg.cv_results_)
 cvResultsDF = cvResultsDF.sort_values(by=['mean_test_score'])
 print("Grid search results: \n", cvResultsDF[["params", "mean_test_score", "rank_test_score"]])
-print('Przewidziano na podstawie ', int((K/100)*howManyRows), ' ostatnich dni.')
+print('Przewidziano na podstawie ', 100-K, '% dni.')
 
 cm = abs(forecast_prediction - y_test)
-plt.plot(list(range(0, len(cm))), cm)
-plt.title('Błąd z - %d dni' % last_training_data)
-plt.ylabel('Wartość błędu w skali 0-1')
-plt.xlabel('Numer próbki')
-plt.show()
+print('ŚREDNIA BŁĘDÓW', sum(cm)/len(cm))
+print('MEDIANA', median(cm))
+plt.figure(figsize=(15, 6))
+plt.subplots_adjust(wspace=0.3)
 
-
+plt.subplot(1, 2, 1)
 plt.plot(list(range(0, len(cm))), forecast_prediction)
 plt.plot(list(range(0, len(cm))), y_test)
-plt.title(f'Przewidziane {int((K/100)*howManyRows)} dni na podstawie {last_training_data} dni')
+plt.title('Przewidziane wartości')
 plt.ylabel('Przeskalowana wartość akcji')
 plt.xlabel('Numer próbki')
 plt.legend(['Predykcja', 'Wartość prawdziwa'])
+
+plt.subplot(1,2,2)
+plt.plot(list(range(0, len(cm))), cm)
+plt.title('Wartość bezwzględna błędu')
+plt.ylabel('Wartość błędu bezwzgl.')
+plt.xlabel('Numer próbki')
+
+
+tytul = "Przewidziano {0} dni (1 dzień do przodu) na podstawie {1} dni."\
+        .format(int((K/100)*howManyRows), last_training_data)
+plt.suptitle(tytul)
 plt.show()
+
+
+
+
+
+
+

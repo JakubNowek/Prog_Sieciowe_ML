@@ -13,3 +13,9 @@ print('X_test\n', X_test)
 print('y_train\n', y_train)
 print('y_test\n', y_test)
 
+X['Prediction'] = X[['a']].shift(-1)
+print('XXXXXXXXX',X)
+y = np.array(X['Prediction'])
+y = y[:-1]
+print(y)
+print('SUMA BŁĘDÓW', sum(y))
