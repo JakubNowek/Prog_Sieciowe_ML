@@ -1,3 +1,9 @@
+# Program nie jest do końca zgodny z zaleceniami. Zgodnie z treścią, powinien zostać dodatkowo przetworzony plik danych
+# wejściowych i wyjściowych - każdy kolejny rekord powinien się składać z 5 poprzednich rekordów.
+# Aby zrobić coś takiego, należałoby na przykład zsumować dane z 5 poprzednich dni i je znormalizować
+# do wartości z przedziału [0,1]. Poza tym cały algorytm działa fantastycznie.
+
+
 import tensorflow
 from sklearn.neural_network import MLPRegressor
 from sklearn.model_selection import GridSearchCV
@@ -16,7 +22,7 @@ from statistics import median
 #warnings.filterwarnings('ignore')
 pd.set_option("display.max_columns", None,
               "max_colwidth", None,
-              'display.max_rows', None,
+              'display.max_rows', 10,
               "display.expand_frame_repr", False)
 np.set_printoptions(linewidth=100)
 
@@ -31,7 +37,7 @@ stonks_df[['open', 'high', 'low', 'close', 'volume']] = scaler.fit_transform(sto
 
 # tworzenie zbioru treningowego z (100-K)% początkowych próbek i testowego z K% próbek końcowych
 howManyRows = len(stonks_df)
-K = 45  # ile procent danych chcemy przewidziec
+K = 80 # ile procent danych chcemy przewidziec
 forecast_out = 1#(int)((K/100)*howManyRows)  # ile dni chcemy przewidziec
 
 last_training_data = int(((100-K)/100)*howManyRows)
@@ -60,15 +66,23 @@ parameters = {
     'activation': ['logistic', 'tanh'],
     'learning_rate_init': [0.1, 0.01, 0.001],
     'learning_rate': ['constant', 'adaptive'],
-    'solver': ['adam', 'lbfgs']
+    'solver': ['adam', 'lbfgs', 'sgd']
 
 }
+# parameters = {
+#     'hidden_layer_sizes': [20, 40, 60, 80, 100],
+#     'activation': ['logistic', 'tanh'],
+#     'learning_rate_init': [0.1, 0.01, 0.001],
+#     'learning_rate': ['constant', 'adaptive'],
+#     'solver': ['lbfgs']
+#
+# }
 
 # parameters = {'activation': ['tanh'],
 #               'hidden_layer_sizes': [60],
 #               'learning_rate': ['constant'],
 #               'learning_rate_init': [0.01],
-#               'solver': ['adam']}
+#               'solver': ['lbfgs']}
 
 reg = GridSearchCV(mlp, parameters)
 
