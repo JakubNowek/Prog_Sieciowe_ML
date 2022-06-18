@@ -1,10 +1,13 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 
-def kohonen(p, alpha_0, dane, ile_razy_T=3):
+
+def kohonen(p, alpha_0, dane, ile_razy_T=5):
 
     N = len(dane)
-    T = N * ile_razy_T
+    T = ile_razy_T
     howManyCols = dane.shape[1]
     suma = 0
     wr_list = []
@@ -27,8 +30,9 @@ def kohonen(p, alpha_0, dane, ile_razy_T=3):
     # print(wr_list)
     print('Wektory repr przed uczeniem:', wr_list,'\n')
 
+    alpha_k = alpha_0
 
-
+    # ==================GŁÓWNA PĘTLA ALGORYTMU===================== #
     for k in range(T):
         # wyznaczanie miary i przypisywanie punktom numeru wektora
         for i in range(len(dane)):
@@ -39,20 +43,39 @@ def kohonen(p, alpha_0, dane, ile_razy_T=3):
             miara1 = np.amax(temp)
             m_list.append(temp.index(miara1))
 
-        alpha_k = alpha_0
 
         # aktualizowanie wektorów reprezentantów
-        for i in range(len(dane)):
+        #for i in range(len(dane)):
             # aktualizacja
             wr_list[m_list[i]] = wr_list[m_list[i]] + alpha_k*(dane.iloc[i]-wr_list[m_list[i]])
             # normalizacja
             wr_list[m_list[i]] = wr_list[m_list[i]] / np.linalg.norm(wr_list[m_list[i]])
+
         # zmniejszanie alpha
         alpha_k = alpha_0*(T-k)/T
-    print('Wektory repr po uczeniu:\n', wr_list)
+    #print('Wektory repr po uczeniu:\n', wr_list)
+    return wr_list
 
 
 iris = pd.read_csv('iris.data', header=None)
 iris = iris.iloc[:, [0, 1, 2]]
 
-kohonen(p=3, alpha_0=0.1, dane=iris)
+wektory = kohonen(p=3, alpha_0=0.1, dane=iris)
+
+for i in range(len(wektory)):
+    wektory[i] = wektory[i].tolist()
+
+
+fig = plt.figure()
+ax = plt.axes(projection='3d')
+ax.set_xlim = ([0, 2])
+ax.set_ylim = ([0, 2])
+ax.set_zlim = ([0, 2])
+
+start = [0, 0, 0]
+
+ax.quiver(start[0], start[1], start[2], wektory[0][0], wektory[0][1], wektory[0][2])
+# ax.quiver(start[0], start[1], start[2], wektory[1][0], wektory[1][1], wektory[1][2])
+# ax.quiver(start[0], start[1], start[2], wektory[2][0], wektory[2][1], wektory[2][2])
+
+
