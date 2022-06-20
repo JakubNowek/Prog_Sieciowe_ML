@@ -15,7 +15,8 @@ def norm1(wr_list, dane, ile_klas, index):
     for m in range(ile_klas):
         # miara pierwsza - iloczyn skalarny
         temp.append(np.dot(wr_list[m], dane.iloc[index]))
-    return temp
+    miara = np.amax(temp)
+    return temp.index(miara)
 
 
 def norm2(wr_list, dane, ile_klas, index):
@@ -23,7 +24,8 @@ def norm2(wr_list, dane, ile_klas, index):
     for m in range(ile_klas):
         # miara druga (norma różnicy)
         temp.append(np.linalg.norm(wr_list[m] - dane.iloc[index]))
-    return temp
+    miara = np.amin(temp)
+    return temp.index(miara)
 
 
 def norm_manh(wr_list, dane, ile_klas, index):
@@ -31,7 +33,8 @@ def norm_manh(wr_list, dane, ile_klas, index):
     for m in range(ile_klas):
         # miara trzecia - sqrt(manhattan)
         temp.append(math.sqrt(cityblock(wr_list[m], dane.iloc[index])))
-    return temp
+    miara = np.amin(temp)
+    return temp.index(miara)
 
 
 def kohonen(p, alpha_0, dane, ile_razy_T=10):
@@ -71,11 +74,9 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
         # wyznaczanie miary i przypisywanie punktom numeru wektora
         for i in range(len(dane)):
             # temp = norm1(wr_list, dane, p, i)
-            # temp = norm2(wr_list, dane, p, i)
-            temp = norm_manh(wr_list, dane, p, i)
-            #miara = np.amax(temp)
-            miara = np.amin(temp)
-            m_list.append(temp.index(miara))
+            temp = norm2(wr_list, dane, p, i)
+            #temp = norm_manh(wr_list, dane, p, i)
+            m_list.append(temp)
 
 
         # aktualizowanie wektorów reprezentantów
@@ -99,7 +100,9 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
 iris = pd.read_csv('iris.data', header=None)
 iris = iris.iloc[:, [0, 1, 2]]
 
-wektory = kohonen(p=2, alpha_0=0.6, dane=iris)
+# =============================wywołanie======================================= #
+wektory = kohonen(p=2, alpha_0=0.1, dane=iris)
+# ============================================================================= #
 
 # zamiana macierzy array na listę wektorów
 for i in range(len(wektory)):
