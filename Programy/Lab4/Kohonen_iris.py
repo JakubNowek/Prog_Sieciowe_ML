@@ -4,6 +4,34 @@ import matplotlib.pyplot as plt
 #from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
+from sklearn.manifold import TSNE  # do zmiany wymiarów
+from scipy.spatial.distance import cityblock  # do liczenia normy Manhattan
+from math import sqrt
+
+
+def norm1(wr_list, dane, ile_klas, index):
+    temp = []
+    for m in range(ile_klas):
+        # miara pierwsza - iloczyn skalarny
+        temp.append(np.dot(wr_list[m], dane.iloc[index]))
+    return temp
+
+
+def norm2(wr_list, dane, ile_klas, index):
+    temp = []
+    for m in range(ile_klas):
+        # miara druga (norma różnicy)
+        temp.append(np.linalg.norm(wr_list[m] - dane.iloc[index]))
+    return temp
+
+
+def norm_manh(wr_list, dane, ile_klas, index):
+    temp = []
+    for m in range(ile_klas):
+        # miara trzecia - sqrt(manhattan)
+        temp.append(sqrt(cityblock(wr_list[m], dane.iloc[index])))
+    return temp
+
 
 def kohonen(p, alpha_0, dane, ile_razy_T=10):
 
@@ -37,12 +65,12 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
     for k in range(T):
         # wyznaczanie miary i przypisywanie punktom numeru wektora
         for i in range(len(dane)):
-            temp = []
-            for m in range(p):
-                # miara pierwsza - iloczyn skalarny
-                temp.append(np.dot(wr_list[m], dane.iloc[i]))
-            miara1 = np.amax(temp)
-            m_list.append(temp.index(miara1))
+            # temp = norm1(wr_list, dane, p, i)
+            # temp = norm2(wr_list, dane, p, i)
+            temp = norm_manh(wr_list, dane, p, i)
+            #miara = np.amax(temp)
+            miara = np.amin(temp)
+            m_list.append(temp.index(miara))
 
 
         # aktualizowanie wektorów reprezentantów
@@ -61,7 +89,7 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
 iris = pd.read_csv('iris.data', header=None)
 iris = iris.iloc[:, [0, 1, 2]]
 
-wektory = kohonen(p=3, alpha_0=0.6, dane=iris)
+wektory = kohonen(p=2, alpha_0=0.6, dane=iris)
 
 # zamiana macierzy array na listę wektorów
 for i in range(len(wektory)):
@@ -77,24 +105,37 @@ for i in range(len(iris)):
     iris.iloc[i] = (offset - iris.iloc[i]) / np.linalg.norm(iris.iloc[i])
 
 
-# # PLOTTOWANIE dla 3d
-# fig = plt.figure()
-# ax = fig.add_subplot(111, projection='3d')
-# start = [0, 0, 0]
-#
-# limity = plt.gca()
-# limity.set_xlim([-1, 2])
-# limity.set_ylim([-1, 2])
-# limity.set_zlim([-1, 2])
-#
-# for i in range(len(iris)):
-#     ax.scatter(iris.iloc[i][0], iris.iloc[i][1], iris.iloc[i][2])
-#
-# ax.quiver(start[0], start[1], start[2], wektory[0][0], wektory[0][1], wektory[0][2], )
-# ax.quiver(start[0], start[1], start[2], wektory[1][0], wektory[1][1], wektory[1][2])
+# PLOTTOWANIE dla 3d
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+start = [0, 0, 0]
+
+limity = plt.gca()
+limity.set_xlim([-1, 2])
+limity.set_ylim([-1, 2])
+limity.set_zlim([-1, 2])
+
+
+iris_set = iris.iloc[:50]
+iris_ver = iris.iloc[50:100]
+iris_vir = iris.iloc[100:150]
+
+
+for i in range(len(iris_set)):
+    ax.scatter(iris_set.iloc[i][0], iris_set.iloc[i][1], iris_set.iloc[i][2], c="red")
+for i in range(len(iris_ver)):
+    ax.scatter(iris_ver.iloc[i][0], iris_ver.iloc[i][1], iris_ver.iloc[i][2], c='yellow')
+for i in range(len(iris_vir)):
+    ax.scatter(iris_vir.iloc[i][0], iris_vir.iloc[i][1], iris_vir.iloc[i][2], c='blue')
+
+
+
+ax.quiver(start[0], start[1], start[2], wektory[0][0], wektory[0][1], wektory[0][2], )
+ax.quiver(start[0], start[1], start[2], wektory[1][0], wektory[1][1], wektory[1][2])
 # ax.quiver(start[0], start[1], start[2], wektory[2][0], wektory[2][1], wektory[2][2])
-#
-# plt.show()
+ax.view_init(0,45)
+plt.show()
+
 
 # DAVIES-BOULDIN
 # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
