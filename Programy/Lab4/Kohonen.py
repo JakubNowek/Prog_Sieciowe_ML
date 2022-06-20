@@ -67,7 +67,7 @@ wektory = kohonen(p=3, alpha_0=0.6, dane=iris)
 for i in range(len(wektory)):
     wektory[i] = wektory[i].tolist()
 
-# NORMALIZACJA IRIS
+# NORMALIZACJA IRIS do plotowania na wykresie z wektorami
 suma = 0
 for i in range(len(iris)):
     suma += iris.iloc[i]
@@ -77,29 +77,30 @@ for i in range(len(iris)):
     iris.iloc[i] = (offset - iris.iloc[i]) / np.linalg.norm(iris.iloc[i])
 
 
-# PLOTTOWANIE
-fig = plt.figure()
-ax = fig.add_subplot(111, projection='3d')
-start = [0, 0, 0]
+# # PLOTTOWANIE
+# fig = plt.figure()
+# ax = fig.add_subplot(111, projection='3d')
+# start = [0, 0, 0]
+#
+# limity = plt.gca()
+# limity.set_xlim([-1, 2])
+# limity.set_ylim([-1, 2])
+# limity.set_zlim([-1, 2])
+#
+# for i in range(len(iris)):
+#     ax.scatter(iris.iloc[i][0], iris.iloc[i][1], iris.iloc[i][2])
+#
+# ax.quiver(start[0], start[1], start[2], wektory[0][0], wektory[0][1], wektory[0][2], )
+# ax.quiver(start[0], start[1], start[2], wektory[1][0], wektory[1][1], wektory[1][2])
+# ax.quiver(start[0], start[1], start[2], wektory[2][0], wektory[2][1], wektory[2][2])
+#
+# plt.show()
 
-limity = plt.gca()
-limity.set_xlim([-1, 2])
-limity.set_ylim([-1, 2])
-limity.set_zlim([-1, 2])
-
-for i in range(len(iris)):
-    ax.scatter(iris.iloc[i][0], iris.iloc[i][1], iris.iloc[i][2])
-
-ax.quiver(start[0], start[1], start[2], wektory[0][0], wektory[0][1], wektory[0][2], )
-ax.quiver(start[0], start[1], start[2], wektory[1][0], wektory[1][1], wektory[1][2])
-ax.quiver(start[0], start[1], start[2], wektory[2][0], wektory[2][1], wektory[2][2])
-
-plt.show()
-
-
+# DAVIES-BOULDIN
 # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
 results = {}
-for i in range(2,11):
+search_range = [2,15]
+for i in range(search_range[0], search_range[1]):  # sprawdzamy minimum dla liczby klas do 2 do 15
     kmeans = KMeans(n_clusters=i, random_state=30)
     labels = kmeans.fit_predict(iris)
     db_index = davies_bouldin_score(iris, labels)
@@ -107,6 +108,11 @@ for i in range(2,11):
 
 plt.plot(list(results.keys()), list(results.values()))
 plt.xlabel("Number of clusters")
-plt.ylabel("Davies-Boulding Index")
+plt.ylabel("Davies-Bouldin Index")
 plt.show()
 
+# wyznaczanie liczby klas, przy których wskaźnik jest najmniejszy
+wskazniki = list(results.values())
+print(wskazniki)
+liczba_klas = wskazniki.index(min(wskazniki)) + search_range[0]
+print('Oszacowana liczba klas: ', liczba_klas)
