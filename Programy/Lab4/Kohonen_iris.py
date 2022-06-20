@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 #from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 unused import
 from sklearn.cluster import KMeans
 from sklearn.metrics import davies_bouldin_score
 from sklearn.manifold import TSNE  # do zmiany wymiarów
 from scipy.spatial.distance import cityblock  # do liczenia normy Manhattan
-from math import sqrt
+
 
 
 def norm1(wr_list, dane, ile_klas, index):
@@ -29,7 +30,7 @@ def norm_manh(wr_list, dane, ile_klas, index):
     temp = []
     for m in range(ile_klas):
         # miara trzecia - sqrt(manhattan)
-        temp.append(sqrt(cityblock(wr_list[m], dane.iloc[index])))
+        temp.append(math.sqrt(cityblock(wr_list[m], dane.iloc[index])))
     return temp
 
 
@@ -41,6 +42,10 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
     suma = 0
     wr_list = []
     m_list = []
+    # współczynniki zmniejszania alpha
+    C = 1
+    C1 = 1
+    C2 = 0.5
     # PRZYGOTOWANIE DANYCH
 
     # przesunięcie
@@ -80,8 +85,13 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
             # normalizacja
             wr_list[m_list[i]] = wr_list[m_list[i]] / np.linalg.norm(wr_list[m_list[i]])
 
-        # zmniejszanie alpha
-        alpha_k = alpha_0*(T-k)/T
+        # zmniejszanie liniowe alpha
+        #alpha_k = alpha_0*(T-k)/T
+        # zmniejszanie wykładnicze alpha
+        #alpha_k = alpha_0*math.exp(-C*k)
+        # zmniejszanie hiperboliczne alpha
+        alpha_k = C1/(C2 + k)
+
     #print('Wektory repr po uczeniu:\n', wr_list)
     return wr_list
 
