@@ -77,7 +77,7 @@ for i in range(len(iris)):
     iris.iloc[i] = (offset - iris.iloc[i]) / np.linalg.norm(iris.iloc[i])
 
 
-# # PLOTTOWANIE
+# # PLOTTOWANIE dla 3d
 # fig = plt.figure()
 # ax = fig.add_subplot(111, projection='3d')
 # start = [0, 0, 0]
@@ -99,7 +99,7 @@ for i in range(len(iris)):
 # DAVIES-BOULDIN
 # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
 results = {}
-search_range = [2,15]
+search_range = [2, 15]
 for i in range(search_range[0], search_range[1]):  # sprawdzamy minimum dla liczby klas do 2 do 15
     kmeans = KMeans(n_clusters=i, random_state=30)
     labels = kmeans.fit_predict(iris)
