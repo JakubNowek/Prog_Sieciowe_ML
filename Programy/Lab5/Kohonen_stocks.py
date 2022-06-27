@@ -42,6 +42,19 @@ def norm_manh(wr_list, dane, ile_klas, index):
     return temp.index(miara)
 
 
+def activation(x, r=1):
+    return np.exp(- (x / r) ** 2)
+
+
+def RBFoneshot(dane, centra, ile_klas):
+    N = len(dane)
+    PHI = np.empty((N, ile_klas))
+    for i in range(N):
+        for j in range(ile_klas):
+            PHI[i][j] = activation(np.linalg.norm(dane.iloc[i] - centra[j]), r=1)
+    print(PHI)
+
+
 def kohonen(p, alpha_0, dane, norm, ile_razy_T=10):
 
     N = len(dane)
@@ -124,62 +137,62 @@ for i in range(len(stonks)):
     stonks.iloc[i] = (offset - stonks.iloc[i]) / np.linalg.norm(offset - stonks.iloc[i])
 
 # =============================wywołanie======================================= #
-p = 20
+p = 3
 alpha_0 = 0.1
 wektory = kohonen(p, alpha_0, stonks, norm1)
 # ============================================================================= #
 
-print(wektory)
+print("WEKTORY\n",wektory)
+
+RBFoneshot(stonks, wektory, p)
+
+# # DAVIES-BOULDIN
+# # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
+# results = {}
+# search_range = [2, 15]
+# for i in range(search_range[0], search_range[1]):  # sprawdzamy minimum dla liczby klas do 2 do 15
+#     kmeans = KMeans(n_clusters=i, random_state=30)
+#     labels = kmeans.fit_predict(stonks)
+#     db_index = davies_bouldin_score(stonks, labels)
+#     results.update({i: db_index})
+#
+# # wyznaczanie liczby klas, przy których wskaźnik jest najmniejszy
+# wskazniki = list(results.values())
+# # print(wskazniki)
+# liczba_klas = wskazniki.index(min(wskazniki)) + search_range[0]
+# print('Oszacowana liczba klas: ', liczba_klas)
 
 
-
-# DAVIES-BOULDIN
-# szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
-results = {}
-search_range = [2, 15]
-for i in range(search_range[0], search_range[1]):  # sprawdzamy minimum dla liczby klas do 2 do 15
-    kmeans = KMeans(n_clusters=i, random_state=30)
-    labels = kmeans.fit_predict(stonks)
-    db_index = davies_bouldin_score(stonks, labels)
-    results.update({i: db_index})
-
-# wyznaczanie liczby klas, przy których wskaźnik jest najmniejszy
-wskazniki = list(results.values())
-# print(wskazniki)
-liczba_klas = wskazniki.index(min(wskazniki)) + search_range[0]
-print('Oszacowana liczba klas: ', liczba_klas)
-
-
-# PLOTTOWANIE
-
-fig = plt.figure(figsize=(12, 6))
-plt.subplots_adjust(wspace=0.1)
-ax = fig.add_subplot(121)
-ax.plot(list(results.keys()), list(results.values()))
-plt.xlabel("Liczba klastrów")
-plt.ylabel("Davies-Bouldin Index")
-plt.title("Wartość współczynnika Davies’a-Bouldin’a")
-#plt.show()
-
-
-# plt.subplot(1, 2, 1)
-ax = fig.add_subplot(122, projection='3d')
-start = [0, 0, 0]
-
-limity = plt.gca()
-limity.set_xlim([-1, 1])
-limity.set_ylim([-1, 1])
-limity.set_zlim([-1, 1])
-
-
-for i in range(len(stonks)):
-    ax.scatter(stonks.iloc[i][0], stonks.iloc[i][1], stonks.iloc[i][2])
-
-for i in range(p):
-    ax.quiver(start[0], start[1], start[2], wektory[i][0], wektory[i][1], wektory[i][2])
-ax.view_init(0, 30)
-plt.title('Trójwymiarowy widok na klasy i wektory reprezentantów')
-tytul = dane_plik + f', liczba klas:{p}, szacowana liczba: {liczba_klas}, alpha: {alpha_0}'
-plt.suptitle(tytul)
-plt.show()
+# # PLOTTOWANIE
+#
+# fig = plt.figure(figsize=(12, 6))
+# plt.subplots_adjust(wspace=0.1)
+# ax = fig.add_subplot(121)
+# ax.plot(list(results.keys()), list(results.values()))
+# plt.xlabel("Liczba klastrów")
+# plt.ylabel("Davies-Bouldin Index")
+# plt.title("Wartość współczynnika Davies’a-Bouldin’a")
+# #plt.show()
+#
+#
+# # plt.subplot(1, 2, 1)
+# ax = fig.add_subplot(122, projection='3d')
+# start = [0, 0, 0]
+#
+# limity = plt.gca()
+# limity.set_xlim([-1, 1])
+# limity.set_ylim([-1, 1])
+# limity.set_zlim([-1, 1])
+#
+#
+# for i in range(len(stonks)):
+#     ax.scatter(stonks.iloc[i][0], stonks.iloc[i][1], stonks.iloc[i][2])
+#
+# for i in range(p):
+#     ax.quiver(start[0], start[1], start[2], wektory[i][0], wektory[i][1], wektory[i][2])
+# ax.view_init(0, 30)
+# plt.title('Trójwymiarowy widok na klasy i wektory reprezentantów')
+# tytul = dane_plik + f', liczba klas:{p}, szacowana liczba: {liczba_klas}, alpha: {alpha_0}'
+# plt.suptitle(tytul)
+# plt.show()
 
