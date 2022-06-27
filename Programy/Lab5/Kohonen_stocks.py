@@ -42,7 +42,7 @@ def norm_manh(wr_list, dane, ile_klas, index):
     return temp.index(miara)
 
 
-def kohonen(p, alpha_0, dane, ile_razy_T=10):
+def kohonen(p, alpha_0, dane, norm, ile_razy_T=10):
 
     N = len(dane)
     T = ile_razy_T
@@ -68,9 +68,7 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
     for k in range(T):
         # wyznaczanie miary i przypisywanie punktom numeru wektora
         for i in range(N):
-            temp = norm1(wr_list, dane, p, i)
-            #temp = norm2(wr_list, dane, p, i)
-            #temp = norm_manh(wr_list, dane, p, i)
+            temp = norm(wr_list, dane, p, i)
             m_list.append(temp)
 
         # aktualizowanie wektorów reprezentantów
@@ -89,6 +87,10 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
         # alpha_k = C1/(C2 + k)
 
     #print('Wektory repr po uczeniu:\n', wr_list)
+
+    # zamiana macierzy array na listę wektorów
+    for i in range(len(wr_list)):
+        wr_list[i] = wr_list[i].tolist()
     return wr_list
 
 
@@ -124,14 +126,13 @@ for i in range(len(stonks)):
 # =============================wywołanie======================================= #
 p = 20
 alpha_0 = 0.1
-wektory = kohonen(p, alpha_0, stonks)
+wektory = kohonen(p, alpha_0, stonks, norm1)
 # ============================================================================= #
 
-# zamiana macierzy array na listę wektorów
-for i in range(len(wektory)):
-    wektory[i] = wektory[i].tolist()
-
 print(wektory)
+
+
+
 # DAVIES-BOULDIN
 # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
 results = {}
@@ -182,13 +183,3 @@ tytul = dane_plik + f', liczba klas:{p}, szacowana liczba: {liczba_klas}, alpha:
 plt.suptitle(tytul)
 plt.show()
 
-
-# fligu = plt.figure()
-# bx = fligu.add_subplot(projection='3d')
-#
-# for i in range(len(stonks)):
-#         bx.scatter(stonks.iloc[i][0], stonks.iloc[i][1], stonks.iloc[i][2])
-#
-# for i in range(p):
-#     bx.quiver(start[0], start[1], start[2], wektory[i][0], wektory[i][1], wektory[i][2])
-# plt.show()
