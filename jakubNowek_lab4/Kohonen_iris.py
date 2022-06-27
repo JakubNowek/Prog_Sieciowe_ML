@@ -48,6 +48,15 @@ def kohonen(p, alpha_0, dane, ile_razy_T=10):
     C = 1
     C1 = 1
     C2 = 0.5
+    # PRZYGOTOWANIE DANYCH
+
+    # przesunięcie
+    for i in range(len(dane)):
+        suma += dane.iloc[i]
+    offset = suma / N
+    # odejmowanie offsetu i normalizacja (dzielenie każdego wektora przez jego normę euklidesową)
+    for i in range(len(dane)):
+        dane.iloc[i] = (offset-dane.iloc[i])/np.linalg.norm(dane.iloc[i])
 
     print(dane)
     # inicjalizacja wektorów reprezentantów
@@ -93,15 +102,6 @@ dane_plik = 'iris.data'
 iris = pd.read_csv(dane_plik, header=None)
 iris = iris.iloc[:, [0, 1, 2]]
 
-# NORMALIZACJA IRIS do plotowania na wykresie z wektorami
-suma = 0
-for i in range(len(iris)):
-    suma += iris.iloc[i]
-offset = suma / len(iris)
-# odejmowanie offsetu i normalizacja (dzielenie każdego wektora przez jego normę euklidesową)
-for i in range(len(iris)):
-    iris.iloc[i] = (offset - iris.iloc[i]) / np.linalg.norm(offset - iris.iloc[i])
-
 # =============================wywołanie======================================= #
 p = 3
 alpha_0 = 0.1
@@ -112,7 +112,14 @@ wektory = kohonen(p, alpha_0, iris)
 for i in range(len(wektory)):
     wektory[i] = wektory[i].tolist()
 
-
+# NORMALIZACJA IRIS do plotowania na wykresie z wektorami
+suma = 0
+for i in range(len(iris)):
+    suma += iris.iloc[i]
+offset = suma / len(iris)
+# odejmowanie offsetu i normalizacja (dzielenie każdego wektora przez jego normę euklidesową)
+for i in range(len(iris)):
+    iris.iloc[i] = (offset - iris.iloc[i]) / np.linalg.norm(iris.iloc[i])
 
 # DAVIES-BOULDIN
 # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
