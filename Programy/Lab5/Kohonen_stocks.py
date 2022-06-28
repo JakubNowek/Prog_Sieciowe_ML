@@ -49,21 +49,44 @@ def activation(x, r=1):
     return np.exp(- (x / r) ** 2)
 
 
-def RBFoneshot(dane, centra, ile_klas, F):
+def RBFoneshot(dane, centra, ile_klas, F, r):
     N = len(dane)
     PHI = np.empty((N, ile_klas))
     for i in range(N):
         for j in range(ile_klas):
-            PHI[i][j] = activation(np.linalg.norm(dane.iloc[i] - centra[j]), r=1)
+            PHI[i][j] = activation(np.linalg.norm(dane.iloc[i] - centra[j]), r)
     print('PHIIII\n', PHI)
     print('press F', F)
     w = np.linalg.pinv(PHI) @ np.array(F)
     print('WUWUNIO\n', w)
+    return w
+
+
+def predict(test, centra, ile_klas, w, r):
+    N = len(test)
+    PHI = np.empty((N, ile_klas))
+    for i in range(N):
+        for j in range(ile_klas):
+            PHI[i][j] = activation(np.linalg.norm(test.iloc[i] - centra[j]), r)
+    print('PHIIII\n', PHI)
+    F = PHI @ w
+    return F
+
+
+def checkPred(pred, real):
+    plt.scatter(real, pred)
+    plt.show()
+    blad = []
+    for i in range(len(real)):
+        blad.append(abs((real[i]-pred[i])/real[i])*100)
+    plt.plot(blad)
+    plt.show()
+
 
 
 def diameter(Points):
     points = np.array(Points)
-    diam = max([math.sqrt(np.sum((p-q)**2, axis=None)) for p,q in tqdm.tqdm(combinations(points, 2))])
+    diam = max([np.linalg.norm(p-q) for p,q in tqdm.tqdm(combinations(points, 2))])
     return diam
 
 
@@ -176,20 +199,28 @@ X_test = X[int(len(X)*(100-K)/100):]
 y_train = y[:int(len(y)*(100-K)/100)]
 y_test = y[int(len(y)*(100-K)/100):]
 
-# X_test = X_test.reset_index(drop=True)
-# y_test = y_test.reset_index(drop=True)
+X_test = X_test.reset_index(drop=True)
+y_test = y_test.reset_index(drop=True)
 
 
 
 # =============================wywołanie======================================= #
 p = 20
-alpha_0 = 0.1
+alpha_0 = 0.5
 wektory = kohonen(p, alpha_0, X_train, norm1)
-# ============================================================================= #
 
 print("WEKTORY\n", wektory)
-print('srednica zbioru', diameter(stonks))
-RBFoneshot(X_train, wektory, p, y_train)
+#print('srednica zbioru', diameter(X))
+
+
+# wektory_pred = kohonen(p, alpha_0, X_test, norm1)
+predicted = predict(X_test, wektory, p, RBFoneshot(X_train, wektory, p, y_train, r=diameter(X)/10), r=diameter(X)/10)
+checkPred(predicted, y_test)
+error = np.sum([(predicted - label)**2 for prediction, label in zip(predicted, y_test)])/len(predicted)
+
+print("Bład mse dla danych testowych = ", error)
+# ============================================================================= #
+
 
 # # DAVIES-BOULDIN
 # # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
