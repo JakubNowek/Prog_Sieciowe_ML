@@ -8,6 +8,9 @@ from sklearn.metrics import davies_bouldin_score
 from sklearn.manifold import TSNE  # do zmiany wymiarów
 from scipy.spatial.distance import cityblock  # do liczenia normy Manhattan
 import seaborn as sns
+from sklearn.model_selection import train_test_split
+import tqdm
+from itertools import combinations
 
 pd.set_option("display.max_columns", None,
               "max_colwidth", None,
@@ -46,13 +49,22 @@ def activation(x, r=1):
     return np.exp(- (x / r) ** 2)
 
 
-def RBFoneshot(dane, centra, ile_klas):
+def RBFoneshot(dane, centra, ile_klas, F):
     N = len(dane)
     PHI = np.empty((N, ile_klas))
     for i in range(N):
         for j in range(ile_klas):
             PHI[i][j] = activation(np.linalg.norm(dane.iloc[i] - centra[j]), r=1)
-    print(PHI)
+    print('PHIIII\n', PHI)
+    print('press F', F)
+    w = np.linalg.pinv(PHI) @ np.array(F)
+    print('WUWUNIO\n', w)
+
+
+def diameter(Points):
+    points = np.array(Points)
+    diam = max([math.sqrt(np.sum((p-q)**2, axis=None)) for p,q in tqdm.tqdm(combinations(points, 2))])
+    return diam
 
 
 def kohonen(p, alpha_0, dane, norm, ile_razy_T=10):
@@ -109,7 +121,7 @@ def kohonen(p, alpha_0, dane, norm, ile_razy_T=10):
 
 # wczytywanie csv
 dane_plik = 'KIM_data.csv'
-stonks = pd.read_csv(dane_plik, usecols=['open', 'high', 'low'])
+stonks = pd.read_csv(dane_plik, usecols=['open', 'high', 'low', 'close'])
 # stonks = pd.read_csv('KIM_data.csv', usecols=['open', 'high', 'low', 'close', 'volume'])
 
 stonks_cpy = stonks.copy()
@@ -136,15 +148,48 @@ offset = suma / len(stonks)
 for i in range(len(stonks)):
     stonks.iloc[i] = (offset - stonks.iloc[i]) / np.linalg.norm(offset - stonks.iloc[i])
 
+# PODZIAŁ na zbiór treningowy i testowy
+
+# tworzenie zbioru treningowego z (100-K)% początkowych próbek i testowego z K% próbek końcowych
+howManyRows = len(stonks)
+K = 10 # ile procent danych chcemy przewidziec
+forecast_out = 1#(int)((K/100)*howManyRows)  # ile dni chcemy przewidziec
+
+last_training_data = int(((100-K)/100)*howManyRows)
+stonks['Prediction'] = stonks[['open']].shift(-forecast_out)
+#print(stonks_df)
+#stonks_tr = stonks_df[:last_training_data]
+
+# budowa wejść
+X = stonks.drop(columns='Prediction')
+X_forecast = X[-forecast_out:]  # ustaw X_forecast na K% dni
+X = X[:-forecast_out]  # remove last K% from X
+#print('X\n', X)
+# budowa wyjść
+y = stonks['Prediction']
+y = y[:-forecast_out]
+#print('y\n', y)
+# tworzenie zbiorów treningowych i testowych
+X_train = X[:int(len(X)*(100-K)/100)]
+X_test = X[int(len(X)*(100-K)/100):]
+
+y_train = y[:int(len(y)*(100-K)/100)]
+y_test = y[int(len(y)*(100-K)/100):]
+
+# X_test = X_test.reset_index(drop=True)
+# y_test = y_test.reset_index(drop=True)
+
+
+
 # =============================wywołanie======================================= #
-p = 3
+p = 20
 alpha_0 = 0.1
-wektory = kohonen(p, alpha_0, stonks, norm1)
+wektory = kohonen(p, alpha_0, X_train, norm1)
 # ============================================================================= #
 
-print("WEKTORY\n",wektory)
-
-RBFoneshot(stonks, wektory, p)
+print("WEKTORY\n", wektory)
+print('srednica zbioru', diameter(stonks))
+RBFoneshot(X_train, wektory, p, y_train)
 
 # # DAVIES-BOULDIN
 # # szacowanie rzeczywistej liczby klas (minimum funkcji to najbardziej prawdopodobna liczba klas)
@@ -152,8 +197,8 @@ RBFoneshot(stonks, wektory, p)
 # search_range = [2, 15]
 # for i in range(search_range[0], search_range[1]):  # sprawdzamy minimum dla liczby klas do 2 do 15
 #     kmeans = KMeans(n_clusters=i, random_state=30)
-#     labels = kmeans.fit_predict(stonks)
-#     db_index = davies_bouldin_score(stonks, labels)
+#     labels = kmeans.fit_predict(X_train)
+#     db_index = davies_bouldin_score(X_train, labels)
 #     results.update({i: db_index})
 #
 # # wyznaczanie liczby klas, przy których wskaźnik jest najmniejszy
@@ -161,8 +206,8 @@ RBFoneshot(stonks, wektory, p)
 # # print(wskazniki)
 # liczba_klas = wskazniki.index(min(wskazniki)) + search_range[0]
 # print('Oszacowana liczba klas: ', liczba_klas)
-
-
+#
+#
 # # PLOTTOWANIE
 #
 # fig = plt.figure(figsize=(12, 6))
@@ -185,8 +230,8 @@ RBFoneshot(stonks, wektory, p)
 # limity.set_zlim([-1, 1])
 #
 #
-# for i in range(len(stonks)):
-#     ax.scatter(stonks.iloc[i][0], stonks.iloc[i][1], stonks.iloc[i][2])
+# for i in range(len(X_train)):
+#     ax.scatter(X_train.iloc[i][0], X_train.iloc[i][1], X_train.iloc[i][2])
 #
 # for i in range(p):
 #     ax.quiver(start[0], start[1], start[2], wektory[i][0], wektory[i][1], wektory[i][2])
