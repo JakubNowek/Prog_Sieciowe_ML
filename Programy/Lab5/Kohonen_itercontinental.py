@@ -161,31 +161,35 @@ def RBF_approximation_iter(X, y, p=20, n_iterations=200, l_r=0.1):
 
 
 path = "KIM_data.csv"
+data = pd.read_csv(path)
 
-stonks = pd.read_csv(path, usecols=['open', 'high', 'low', 'close'])
-# stonks = pd.read_csv('KIM_data.csv', usecols=['open', 'high', 'low', 'close', 'volume'])
+# Dane wejściowe X
+X = data[["high", "low", "close", "volume"]].values
+# Dane wyjściowe y (Będziemy opisywać wszystkie ceny otwarcia).
+y = data[["open"]].values
 
-stonks_cpy = stonks.copy()
+X_cpy = X.copy()
+y_cpy = y.copy()
 # 5 dni do jednego
 ile_dni = 5
-for i in range(len(stonks)):
+for i in range(len(X)):
     if i - ile_dni >= 0:
         for j in range(1, ile_dni):
-            stonks.iloc[i] += stonks_cpy.iloc[i-j]
-        stonks.iloc[i] = stonks.iloc[i]/ile_dni
+            X[i] += X_cpy[i-j]
+            y[i] += y_cpy[i - j]
+        X[i] = X[i]/ile_dni
+        y[i] = y[i] / ile_dni
     else:
-        stonks.iloc[i] = "NaN"
+        X[i] = "NaN"
+        y[i] = "NaN"
 
-# wyrzucanie nieprzydatnych danych
-stonks = stonks.iloc[5:]
-stonks = stonks.reset_index(drop=True)
-# # Dane wejściowe X
-# X = data[["high", "low", "close", "volume"]].values
-# # Dane wyjściowe y (Będziemy opisywać wszystkie ceny otwarcia).
-# y = data[["open"]].values
-#
-# # Podział danych na dane testowe oraz dane treningowe.
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1, shuffle=False)
+X = X[5:]
+#X = X.reset_index(drop=True)
+
+y = y[5:]
+#y = y.reset_index(drop=True)
+# Podział danych na dane testowe oraz dane treningowe.
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
 # normalizacja danych.
 scaler = StandardScaler()
